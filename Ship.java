@@ -1,9 +1,13 @@
 public class Ship {
     private int noOfPassengers;
     private int blackBoxTicks;
-    public Ship (){
-        this.noOfPassengers = (int)(Math.random()*100+1);
+    private int x,y;
+
+    public Ship (int noOfPassengers, int x, int y){
+        this.noOfPassengers = noOfPassengers;
         this.blackBoxTicks=0;
+        this.x=x;
+        this.y=y;
     }
     public int getNoOfPassengers() {
         return noOfPassengers;
