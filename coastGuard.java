@@ -23,28 +23,32 @@ public class coastGuard implements generalSearch{
         this.maxCapacity = maxCapacity;
     }
 
-    @Override
-    public void BFS() {
+    public static void BFS(String grid, Boolean visualize) {
+
+    }
+    public static void DFS(String grid, Boolean visualize) {
 
     }
 
-    @Override
-    public void DFS() {
+
+    public static void IDS(String grid, Boolean visualize) {
+
+    }
+    public static void greedyH1(String grid, Boolean visualize) {
+
 
     }
 
-    @Override
-    public void IDS() {
+    public static void greedyH2(String grid, Boolean visualize) {
 
     }
 
-    @Override
-    public void greedy(int heuristic) {
+
+    public static void aStarH1(String grid, Boolean visualize) {
 
     }
 
-    @Override
-    public void aStar(int heuristic) {
+    public static void aStarH2(String grid, Boolean visualize) {
 
     }
     public static String genGrid(){
@@ -53,7 +57,7 @@ public class coastGuard implements generalSearch{
         int m = (int)(Math.random()*11+5); //5<=m<=15 - j - columns
         grid.append(m+","+n+";");
 
-        //2 ships, 2 stations
+        //todo- randomize no. of ships & stations
 
         boolean [][] assigned = new boolean[n][m];
         for (int i=0;i<5;i++) {
@@ -80,7 +84,15 @@ public class coastGuard implements generalSearch{
     }
     public static void solve(String grid, String strategy, Boolean visualize){
 //        todo - convert grid to 2d arr, extract info
-
+        switch(strategy) {
+            case ("BF"):
+            case ("DF"):
+            case ("ID"):
+            case ("GR1"):
+            case ("GR2"):
+            case ("AS1"):
+            case ("AS2"):
+        }
     }
 
     public static void main(String[] args) {
