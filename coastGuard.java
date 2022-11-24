@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class coastGuard extends GeneralSearch {
     private int currCapacity;
     private int maxCapacity;
@@ -22,7 +24,32 @@ public class coastGuard extends GeneralSearch {
     public void setMaxCapacity(int maxCapacity) {
         this.maxCapacity = maxCapacity;
     }
-
+    private static Object[][] convertToGrid(String grid) {
+        String [] gridSplit = grid.split(";");
+        //create grid
+        int m = Integer.parseInt(gridSplit[0].split(",")[0]);
+        int n = Integer.parseInt(gridSplit[0].split(",")[1]);
+        Object[][] gridArr = new Object[n][m];
+        //add coast guard
+        int x = Integer.parseInt(gridSplit[2].split(",")[0]);
+        int y = Integer.parseInt(gridSplit[2].split(",")[1]);
+        gridArr[x][y]= new coastGuard(Integer.parseInt(gridSplit[1]));
+        //add stations
+        String [] stationsLocations = gridSplit[3].split(",");
+        for(int i=0; i< stationsLocations.length-1;i+=2){
+            x = Integer.parseInt(stationsLocations[i]);
+            y = Integer.parseInt(stationsLocations[i+1]);
+            gridArr[x][y]=new Station();
+        }
+        //add ships
+        String [] shipsLocations = gridSplit[4].split(",");
+        for(int i=0; i< shipsLocations.length-2;i+=3){
+            x = Integer.parseInt(shipsLocations[i]);
+            y = Integer.parseInt(shipsLocations[i+1]);
+            gridArr[x][y]=new Ship(Integer.parseInt(shipsLocations[i+2]),x,y);
+        }
+        return gridArr;
+    }
     public static String genGrid() {
         StringBuilder grid = new StringBuilder();
         int n = (int) (Math.random() * 11 + 5); //5<=n<=15 - i - rows
@@ -59,13 +86,28 @@ public class coastGuard extends GeneralSearch {
 
         return grid.toString();
     }
-
-    public static void solve(String grid, String strategy, Boolean visualize) {
-//        todo - convert grid to 2d arr, extract info
+    public static void solve(String grid, String strategy, Boolean visualize){
+        Object [][] gridArr = convertToGrid(grid);
+        switch(strategy) {
+            case ("BF"):
+            case ("DF"):
+            case ("ID"):
+            case ("GR1"):
+//                greedyH1(grid, visualize);
+//                break;
+            case ("GR2"):
+            case ("AS1"):
+            case ("AS2"):
+        }
     }
 
+
+
     public static void main(String[] args) {
-        System.out.println(genGrid());
+//        System.out.println(genGrid());
+//        Object [][]arr = convertToGrid("3,4;97;1,2;0,1,3,0;3,2,65,0,0,10;");
+//        for(Object [] x:arr)
+//        System.out.println(Arrays.toString(x));
     }
 
 }
