@@ -5,8 +5,8 @@ import java.util.HashSet;
 public class coastGuard extends GeneralSearch {
     static int[] dx = {0, -1, 0, 1};
     static int[] dy = {-1, 0, 1, 0};
-    private int currCapacity;
-    private int maxCapacity;
+    private static int currCapacity;
+    private static int maxCapacity;
     private static int x,y; //coastGuard location
     private static HashSet<Pair> stations;
     private static HashMap<Pair,Ship> ships;
@@ -47,6 +47,7 @@ public class coastGuard extends GeneralSearch {
         int y = Integer.parseInt(coastGuard[1]);
         //shouldn't it be yx?
         gridArr[x][y] = new coastGuard(Integer.parseInt(gridSplit[1]));
+        maxCapacity=Integer.parseInt(gridSplit[1]);
         //add stations
         String[] stationsLocations = gridSplit[3].split(",");
         for (int i = 0; i < stationsLocations.length - 1; i += 2) {
@@ -176,18 +177,84 @@ public class coastGuard extends GeneralSearch {
     static int distance(Pair p){
         return (p.getX()-x) + (p.getY()-y);
     }
-
+//    get distance to nearest ship
+    static int minDist(){
+        int min=0; //todo - make sure en 0 tmam
+        for(Pair p:ships.keySet()){
+            min = Math.min(min, distance(p));
+        }
+        return min;
+    }
     public static void greedy(int heuristic) {
+        Node root = new Node("root",ships,null,0,0);
         if(heuristic==1)
-            greedyH1();
+            greedyH1(root);
         else
             greedyH2();
     }
-    public static void greedyH1(){
+    public static void greedyH1(Node root) {
+        //check root is goal
+        if (root.isGoal()) {
+            getPath(root);
+            return;
+        }
+        //expand root - add possible children to queue
+        String prevAction="";
+        //todo - update grid/ships
+        if (grid[x][y] instanceof Ship s) {
+            if (currCapacity < maxCapacity && s.getNoOfPassengers()>0) {
+                //pickup
+                pickup(s);
+                prevAction="pickup";
+//                Node c1 = new Node(prevAction,ships,root,root.getDeaths()+?, root.getBlackBoxesDamaged()+?);
+            }
+            else if(s.getNoOfPassengers()==0 && !(s.isBlackBoxRetrieved())){
+                //retrieve
+                s.setBlackBoxRetrieved(true);
+                //todo - update blackboxes count somewhere
+                prevAction="retrieve";
+            }
+        }
+        if (grid[x][y] instanceof Station) {
+            //dropoff
+            currCapacity=0;
+            prevAction="drop";
+        }
+        else {
+            //move
+            for (int i = 0; i < 4; i++) {
+                int newX = x + dx[i];
+                int newY = y + dy[i];
+                if (validCell(newX, newY)) {
 
+                }
+            }
+        }
+        //todo - add children to queue
+        //todo - in order to create new Nodes, i need to calculate cost as parent cost + action cost
+        //todo - action cost calculated feen? - update unUpdateGridShips, updateShip, ... ?
+        //feen el queue asln
+        //pop next and call greedy1 wla da f solve?
+    }
+    public static void pickup(Ship s){
+        int diff = maxCapacity - currCapacity;
+        if(diff<s.getNoOfPassengers()) {
+            s.setNoOfPassengers(s.getNoOfPassengers() - diff);
+            currCapacity = maxCapacity;
+        }
+        else{
+            s.setNoOfPassengers(0);
+            currCapacity += diff;
+        }
     }
     public static void greedyH2(){
-
+        //todo
+    }
+    static int h1(Node n){
+        return n.getShips().size()*minDist();
+    }
+    public static void getPath(Node last){
+        //todo
     }
     public static void main(String[] args) {
 //        System.out.println(genGrid());

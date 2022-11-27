@@ -2,16 +2,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Node {
-    private String prevAction; //one of 7 & specify how many picked-up/dropped-off
-//    private int costSoFar; //int wla pair?? //calculated wla fl constructor - todo
+
+    private String prevAction; //follow naming convention in description -> left,right,pickup,up,drop,down,retrieve - or "root" only for root node
+    //todo - specify no of passengers in case of drop/pickup - we need it for backtracking i think
+    private int deaths;
+    private int blackBoxesDamaged;
     private Node parent;
     private HashMap<Pair,Ship> ships;
 
-    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent) {
+    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged) {
         this.prevAction = prevAction;
         this.parent = parent;
-//        this.costSoFar = costSoFar;
         this.ships = ships;
+        this.deaths=deaths;
+        this.blackBoxesDamaged=blackBoxesDamaged;
     }
     public boolean isGoal(){
         for (Map.Entry<Pair, Ship> s :ships.entrySet()) {
@@ -54,4 +58,19 @@ public class Node {
         this.parent = parent;
     }
 
+    public int getDeaths() {
+        return deaths;
+    }
+
+    public void setDeaths(int deaths) {
+        this.deaths = deaths;
+    }
+
+    public int getBlackBoxesDamaged() {
+        return blackBoxesDamaged;
+    }
+
+    public void setBlackBoxesDamaged(int blackBoxesDamaged) {
+        this.blackBoxesDamaged = blackBoxesDamaged;
+    }
 }
