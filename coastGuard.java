@@ -1,10 +1,15 @@
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class coastGuard extends GeneralSearch {
     static int[] dx = {0, -1, 0, 1};
     static int[] dy = {-1, 0, 1, 0};
     private int currCapacity;
     private int maxCapacity;
+    private static int x,y; //coastGuard location
+    private static HashSet<Pair> stations;
+    private static HashMap<Pair,Ship> ships;
 
     static private Object[][] grid;
 
@@ -48,13 +53,17 @@ public class coastGuard extends GeneralSearch {
             x = Integer.parseInt(stationsLocations[i]);
             y = Integer.parseInt(stationsLocations[i + 1]);
             gridArr[x][y] = new Station();
+            stations.add(new Pair(x,y));
         }
         //add ships
         String[] shipsLocations = gridSplit[4].split(",");
+        Ship s;
         for (int i = 0; i < shipsLocations.length - 2; i += 3) {
             x = Integer.parseInt(shipsLocations[i]);
             y = Integer.parseInt(shipsLocations[i + 1]);
-            gridArr[x][y] = new Ship(Integer.parseInt(shipsLocations[i + 2]), x, y);
+            s = new Ship(Integer.parseInt(shipsLocations[i + 2]), x, y);
+            gridArr[x][y] = s;
+            ships.put(new Pair(x,y),s);
         }
         return gridArr;
     }
@@ -150,30 +159,36 @@ public class coastGuard extends GeneralSearch {
     }
 
     public static void updateGridShips() {
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[0].length; i++) {
-                if (grid[i][j] instanceof Ship) {
-                    ((Ship) grid[i][j]).updateShip();
-                }
-            }
+        for(int i=0; i< ships.size();i++){
+            ships.get(i).updateShip();
         }
     }
 
     public static void unUpdateGridShips() {
-        for (int i = 0; i < grid.length; i++) {
-            for (int j = 0; j < grid[0].length; i++) {
-                if (grid[i][j] instanceof Ship) {
-                    ((Ship) grid[i][j]).unUpdateShip();
-                }
-            }
+        for(int i=0; i< ships.size();i++){
+            ships.get(i).unUpdateShip();
         }
     }
 
     static boolean validCell(int newX, int newY) {
         return newX > 0 && newX < grid.length && newY > 0 && newY < grid[0].length;
     }
+    static int distance(Pair p){
+        return (p.getX()-x) + (p.getY()-y);
+    }
 
+    public static void greedy(int heuristic) {
+        if(heuristic==1)
+            greedyH1();
+        else
+            greedyH2();
+    }
+    public static void greedyH1(){
 
+    }
+    public static void greedyH2(){
+
+    }
     public static void main(String[] args) {
 //        System.out.println(genGrid());
 //        Object [][]arr = convertToGrid("3,4;97;1,2;0,1,3,0;3,2,65,0,0,10;");
