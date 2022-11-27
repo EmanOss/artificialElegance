@@ -4,7 +4,6 @@ public abstract  class GeneralSearch {
     };
 
     public static void DFS() {
-
     }
 
     public static void IDS() {

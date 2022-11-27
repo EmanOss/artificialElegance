@@ -1,8 +1,12 @@
 import java.util.Arrays;
 
 public class coastGuard extends GeneralSearch {
+    static int[] dx = {0, -1, 0, 1};
+    static int[] dy = {-1, 0, 1, 0};
     private int currCapacity;
     private int maxCapacity;
+
+    static private Object[][] grid;
 
     public coastGuard(int maxCapacity) {
         currCapacity = 0;
@@ -24,32 +28,37 @@ public class coastGuard extends GeneralSearch {
     public void setMaxCapacity(int maxCapacity) {
         this.maxCapacity = maxCapacity;
     }
+
     private static Object[][] convertToGrid(String grid) {
-        String [] gridSplit = grid.split(";");
+        String[] gridSplit = grid.split(";");
         //create grid
-        int m = Integer.parseInt(gridSplit[0].split(",")[0]);
-        int n = Integer.parseInt(gridSplit[0].split(",")[1]);
+        String[] dimension = gridSplit[0].split(",");
+        int m = Integer.parseInt(dimension[0]);
+        int n = Integer.parseInt(dimension[1]);
         Object[][] gridArr = new Object[n][m];
         //add coast guard
-        int x = Integer.parseInt(gridSplit[2].split(",")[0]);
-        int y = Integer.parseInt(gridSplit[2].split(",")[1]);
-        gridArr[x][y]= new coastGuard(Integer.parseInt(gridSplit[1]));
+        String[] coastGuard = gridSplit[2].split(",");
+        int x = Integer.parseInt(coastGuard[0]);
+        int y = Integer.parseInt(coastGuard[1]);
+        //shouldn't it be yx?
+        gridArr[x][y] = new coastGuard(Integer.parseInt(gridSplit[1]));
         //add stations
-        String [] stationsLocations = gridSplit[3].split(",");
-        for(int i=0; i< stationsLocations.length-1;i+=2){
+        String[] stationsLocations = gridSplit[3].split(",");
+        for (int i = 0; i < stationsLocations.length - 1; i += 2) {
             x = Integer.parseInt(stationsLocations[i]);
-            y = Integer.parseInt(stationsLocations[i+1]);
-            gridArr[x][y]=new Station();
+            y = Integer.parseInt(stationsLocations[i + 1]);
+            gridArr[x][y] = new Station();
         }
         //add ships
-        String [] shipsLocations = gridSplit[4].split(",");
-        for(int i=0; i< shipsLocations.length-2;i+=3){
+        String[] shipsLocations = gridSplit[4].split(",");
+        for (int i = 0; i < shipsLocations.length - 2; i += 3) {
             x = Integer.parseInt(shipsLocations[i]);
-            y = Integer.parseInt(shipsLocations[i+1]);
-            gridArr[x][y]=new Ship(Integer.parseInt(shipsLocations[i+2]),x,y);
+            y = Integer.parseInt(shipsLocations[i + 1]);
+            gridArr[x][y] = new Ship(Integer.parseInt(shipsLocations[i + 2]), x, y);
         }
         return gridArr;
     }
+
     public static String genGrid() {
         StringBuilder grid = new StringBuilder();
         int n = (int) (Math.random() * 11 + 5); //5<=n<=15 - i - rows
@@ -64,13 +73,13 @@ public class coastGuard extends GeneralSearch {
 
         boolean[][] assigned = new boolean[n][m];
         for (int i = 0; i < stations + ships + 1; i++) {
-            int y = (int) (Math.random() * n);
-            int x = (int) (Math.random() * m); //col
-            while (assigned[y][x]) {
-                y = (int) (Math.random() * n);
-                x = (int) (Math.random() * m);
+            int x = (int) (Math.random() * n);
+            int y = (int) (Math.random() * m); //col
+            while (assigned[x][y]) {
+                x = (int) (Math.random() * n);
+                y = (int) (Math.random() * m);
             }
-            assigned[y][x] = true;
+            assigned[x][y] = true;
             if (i == 0)
                 grid.append((int) (Math.random() * 71 + 30) + ";" + x + "," + y + ";");
             else if (i < stations)
@@ -86,9 +95,10 @@ public class coastGuard extends GeneralSearch {
 
         return grid.toString();
     }
-    public static void solve(String grid, String strategy, Boolean visualize){
-        Object [][] gridArr = convertToGrid(grid);
-        switch(strategy) {
+
+    public static void solve(String gridStr, String strategy, Boolean visualize) {
+        grid = convertToGrid(gridStr);
+        switch (strategy) {
             case ("BF"):
             case ("DF"):
             case ("ID"):
@@ -101,6 +111,67 @@ public class coastGuard extends GeneralSearch {
         }
     }
 
+    public static void DFS(int xStart, int yStart) {
+        // check if goal is reached
+        //if (ZeroPassengers and boxs)
+//        return;
+
+
+        //there are 7 actions
+        //pickup or retrieve
+        if (grid[xStart][yStart] instanceof Ship) {
+            //updateaction
+            updateGridShips();
+            DFS(xStart, yStart);
+            unUpdateGridShips();
+            //unretrieve
+        }
+        //drop
+        if (grid[xStart][yStart] instanceof Station) {
+            //drop
+            updateGridShips();
+            DFS(xStart, yStart);
+            unUpdateGridShips();
+            //un-drop
+        }
+
+        for (int i = 0; i < 4; i++) {
+            //update ships
+            int newX = xStart + dx[i];
+            int newY = yStart + dy[i];
+            if (validCell(newX, newY)) {
+                updateGridShips();
+                DFS(newX, newY);
+                unUpdateGridShips();
+            }
+
+            // should go to original state here to continue actions if there is
+        }
+    }
+
+    public static void updateGridShips() {
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; i++) {
+                if (grid[i][j] instanceof Ship) {
+                    ((Ship) grid[i][j]).updateShip();
+                }
+            }
+        }
+    }
+
+    public static void unUpdateGridShips() {
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; i++) {
+                if (grid[i][j] instanceof Ship) {
+                    ((Ship) grid[i][j]).unUpdateShip();
+                }
+            }
+        }
+    }
+
+    static boolean validCell(int newX, int newY) {
+        return newX > 0 && newX < grid.length && newY > 0 && newY < grid[0].length;
+    }
 
 
     public static void main(String[] args) {
