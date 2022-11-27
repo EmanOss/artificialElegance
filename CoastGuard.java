@@ -1,21 +1,23 @@
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class coastGuard extends GeneralSearch {
+public class CoastGuard extends GeneralSearch {
     static int[] dx = {0, -1, 0, 1};
     static int[] dy = {-1, 0, 1, 0};
     private static int currCapacity;
     private static int maxCapacity;
-    private static int x,y; //coastGuard location
+    private static int cgX, cgY; //coastGuard location
     private static HashSet<Pair> stations;
-    private static HashMap<Pair,Ship> ships;
+    private static HashMap<Pair, Ship> ships;
 
     static private Object[][] grid;
+    static StringBuilder plan;
 
-    public coastGuard(int maxCapacity) {
+    public CoastGuard(int maxCapacity) {
         currCapacity = 0;
         maxCapacity = this.maxCapacity;//range 30 to 100 inclusive
+        stations= new HashSet<>();
+        ships= new HashMap<>();
     }
 
     public int getCurrCapacity() {
@@ -43,18 +45,19 @@ public class coastGuard extends GeneralSearch {
         Object[][] gridArr = new Object[n][m];
         //add coast guard
         String[] coastGuard = gridSplit[2].split(",");
-        int x = Integer.parseInt(coastGuard[0]);
-        int y = Integer.parseInt(coastGuard[1]);
+        cgX = Integer.parseInt(coastGuard[0]);
+        cgY = Integer.parseInt(coastGuard[1]);
         //shouldn't it be yx?
-        gridArr[x][y] = new coastGuard(Integer.parseInt(gridSplit[1]));
-        maxCapacity=Integer.parseInt(gridSplit[1]);
+        gridArr[cgX][cgY] = new CoastGuard(Integer.parseInt(gridSplit[1]));
+        maxCapacity = Integer.parseInt(gridSplit[1]);
         //add stations
+        int x,y;
         String[] stationsLocations = gridSplit[3].split(",");
         for (int i = 0; i < stationsLocations.length - 1; i += 2) {
             x = Integer.parseInt(stationsLocations[i]);
             y = Integer.parseInt(stationsLocations[i + 1]);
             gridArr[x][y] = new Station();
-            stations.add(new Pair(x,y));
+            stations.add(new Pair(x, y));
         }
         //add ships
         String[] shipsLocations = gridSplit[4].split(",");
@@ -64,7 +67,7 @@ public class coastGuard extends GeneralSearch {
             y = Integer.parseInt(shipsLocations[i + 1]);
             s = new Ship(Integer.parseInt(shipsLocations[i + 2]), x, y);
             gridArr[x][y] = s;
-            ships.put(new Pair(x,y),s);
+            ships.put(new Pair(x, y), s);
         }
         return gridArr;
     }
@@ -106,11 +109,13 @@ public class coastGuard extends GeneralSearch {
         return grid.toString();
     }
 
-    public static void solve(String gridStr, String strategy, Boolean visualize) {
+    public static String solve(String gridStr, String strategy, Boolean visualize) {
         grid = convertToGrid(gridStr);
+        plan = new StringBuilder("");
         switch (strategy) {
             case ("BF"):
             case ("DF"):
+                DFS(cgX, cgY);
             case ("ID"):
             case ("GR1"):
 //                greedyH1(grid, visualize);
@@ -119,29 +124,52 @@ public class coastGuard extends GeneralSearch {
             case ("AS1"):
             case ("AS2"):
         }
+        return plan.toString();
     }
 
     public static void DFS(int xStart, int yStart) {
-        // check if goal is reached
-        //if (ZeroPassengers and boxs)
-//        return;
+        if (isGoal()){
+            System.out.println(plan.toString());
+            return;
 
-
-        //there are 7 actions
-        //pickup or retrieve
-        if (grid[xStart][yStart] instanceof Ship) {
-            //updateaction
-            updateGridShips();
-            DFS(xStart, yStart);
-            unUpdateGridShips();
-            //unretrieve
+        }
+        if (grid[xStart][yStart] instanceof Ship && !((Ship) grid[xStart][yStart]).isBlackBoxRetrieved()) {
+            Ship ship = (Ship) grid[xStart][yStart];
+            //pickup
+            if (ship.getNoOfPassengers() > 0 && currCapacity < maxCapacity) {
+                int takenPassengers = Math.min(maxCapacity-currCapacity, ship.getNoOfPassengers());
+                currCapacity += takenPassengers;
+                ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
+                updateGridShips();
+                plan.append("pickup,");
+                DFS(xStart, yStart);
+                plan.delete(plan.length()-7, plan.length());
+                unUpdateGridShips();
+                ship.setNoOfPassengers(ship.getNoOfPassengers() + takenPassengers);
+                currCapacity -= takenPassengers;
+            }
+            //retrieve
+            if (ship.getNoOfPassengers() == 0) {
+                ship.setBlackBoxRetrieved(true);
+                updateGridShips();
+                plan.append("retrieve,");
+                DFS(xStart, yStart);
+                plan.delete(plan.length()-9, plan.length());
+                unUpdateGridShips();
+                ship.setBlackBoxRetrieved(true);
+            }
         }
         //drop
         if (grid[xStart][yStart] instanceof Station) {
             //drop
+            int passengersToDrop = currCapacity;
+            currCapacity = 0;
             updateGridShips();
+            plan.append("drop,");
             DFS(xStart, yStart);
+            plan.delete(plan.length()-5, plan.length());
             unUpdateGridShips();
+            currCapacity = passengersToDrop;
             //un-drop
         }
 
@@ -151,7 +179,10 @@ public class coastGuard extends GeneralSearch {
             int newY = yStart + dy[i];
             if (validCell(newX, newY)) {
                 updateGridShips();
+                String move=getMove(dx[i],dy[i]);
+                plan.append(move);
                 DFS(newX, newY);
+                plan.delete(plan.length()-move.length(), plan.length());
                 unUpdateGridShips();
             }
 
@@ -160,38 +191,54 @@ public class coastGuard extends GeneralSearch {
     }
 
     public static void updateGridShips() {
-        for(int i=0; i< ships.size();i++){
-            ships.get(i).updateShip();
+        for (Pair p: ships.keySet()) {
+            ships.get(p).updateShip();
         }
     }
 
     public static void unUpdateGridShips() {
-        for(int i=0; i< ships.size();i++){
-            ships.get(i).unUpdateShip();
+        for (Pair p: ships.keySet()) {
+
+            ships.get(p).unUpdateShip();
         }
     }
 
+    public static String getMove(int dx, int dy)
+    {
+        if(dx==0 && dy==1)
+            return "right,";
+        if(dx==0 && dy==-1)
+            return "left,";
+        if(dx==1 && dy==0)
+            return "down,";
+        else
+            return "up,";
+    }
     static boolean validCell(int newX, int newY) {
         return newX > 0 && newX < grid.length && newY > 0 && newY < grid[0].length;
     }
-    static int distance(Pair p){
-        return (p.getX()-x) + (p.getY()-y);
+
+    static int distance(Pair p) {
+        return (p.getX() - cgX) + (p.getY() - cgY);
     }
-//    get distance to nearest ship
-    static int minDist(){
-        int min=0; //todo - make sure en 0 tmam
-        for(Pair p:ships.keySet()){
+
+    //    get distance to nearest ship
+    static int minDist() {
+        int min = 0; //todo - make sure en 0 tmam
+        for (Pair p : ships.keySet()) {
             min = Math.min(min, distance(p));
         }
         return min;
     }
+
     public static void greedy(int heuristic) {
-        Node root = new Node("root",ships,null,0,0);
-        if(heuristic==1)
+        Node root = new Node("root", ships, null, 0, 0);
+        if (heuristic == 1)
             greedyH1(root);
         else
             greedyH2();
     }
+
     public static void greedyH1(Node root) {
         //check root is goal
         if (root.isGoal()) {
@@ -199,32 +246,30 @@ public class coastGuard extends GeneralSearch {
             return;
         }
         //expand root - add possible children to queue
-        String prevAction="";
+        String prevAction = "";
         //todo - update grid/ships
-        if (grid[x][y] instanceof Ship s) {
-            if (currCapacity < maxCapacity && s.getNoOfPassengers()>0) {
+        if (grid[cgX][cgY] instanceof Ship s) {
+            if (currCapacity < maxCapacity && s.getNoOfPassengers() > 0) {
                 //pickup
                 pickup(s);
-                prevAction="pickup";
+                prevAction = "pickup";
 //                Node c1 = new Node(prevAction,ships,root,root.getDeaths()+?, root.getBlackBoxesDamaged()+?);
-            }
-            else if(s.getNoOfPassengers()==0 && !(s.isBlackBoxRetrieved())){
+            } else if (s.getNoOfPassengers() == 0 && !(s.isBlackBoxRetrieved())) {
                 //retrieve
                 s.setBlackBoxRetrieved(true);
                 //todo - update blackboxes count somewhere
-                prevAction="retrieve";
+                prevAction = "retrieve";
             }
         }
-        if (grid[x][y] instanceof Station) {
+        if (grid[cgX][cgY] instanceof Station) {
             //dropoff
-            currCapacity=0;
-            prevAction="drop";
-        }
-        else {
+            currCapacity = 0;
+            prevAction = "drop";
+        } else {
             //move
             for (int i = 0; i < 4; i++) {
-                int newX = x + dx[i];
-                int newY = y + dy[i];
+                int newX = cgX + dx[i];
+                int newY = cgY + dy[i];
                 if (validCell(newX, newY)) {
 
                 }
@@ -236,31 +281,50 @@ public class coastGuard extends GeneralSearch {
         //feen el queue asln
         //pop next and call greedy1 wla da f solve?
     }
-    public static void pickup(Ship s){
+
+    public static void pickup(Ship s) {
         int diff = maxCapacity - currCapacity;
-        if(diff<s.getNoOfPassengers()) {
+        if (diff < s.getNoOfPassengers()) {
             s.setNoOfPassengers(s.getNoOfPassengers() - diff);
             currCapacity = maxCapacity;
-        }
-        else{
+        } else {
             s.setNoOfPassengers(0);
             currCapacity += diff;
         }
     }
-    public static void greedyH2(){
+
+    public static void greedyH2() {
         //todo
     }
-    static int h1(Node n){
-        return n.getShips().size()*minDist();
+
+    static int h1(Node n) {
+        return n.getShips().size() * minDist();
     }
-    public static void getPath(Node last){
+
+    public static void getPath(Node last) {
         //todo
     }
+
     public static void main(String[] args) {
 //        System.out.println(genGrid());
 //        Object [][]arr = convertToGrid("3,4;97;1,2;0,1,3,0;3,2,65,0,0,10;");
 //        for(Object [] x:arr)
 //        System.out.println(Arrays.toString(x));
+    }
+
+    public static boolean isGoal() {
+        for (int i = 0; i < grid.length; i++) {
+            for (int j = 0; j < grid[0].length; j++) {
+                if (grid[i][j] instanceof Ship) {
+                    Ship s = (Ship) grid[i][j];
+                    if (s.getNoOfPassengers() > 0)
+                        return false;
+                    if (!(s.isBlackBoxRetrieved()) && s.getBlackBoxTicks() < 20)
+                        return false;
+                }
+            }
+        }
+        return true;
     }
 
 }

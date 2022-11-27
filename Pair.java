@@ -1,4 +1,4 @@
-public class Pair {
+public class Pair{
     private int x,y; //location
 
     public Pair(int x, int y) {
@@ -24,4 +24,21 @@ public class Pair {
     public void setY(int y) {
         this.y = y;
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Pair)) return false;
+        Pair pair = (Pair) o;
+        return x == pair.x && y == pair.y;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = x;
+        result = 31 * result + y;
+        return result;
+    }
+
 }
