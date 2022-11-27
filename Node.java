@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.Map;
 
 public class Node {
     private String prevAction; //one of 7 & specify how many picked-up/dropped-off
@@ -11,6 +12,15 @@ public class Node {
         this.parent = parent;
 //        this.costSoFar = costSoFar;
         this.ships = ships;
+    }
+    public boolean isGoal(){
+        for (Map.Entry<Pair, Ship> s :ships.entrySet()) {
+            if(s.getValue().getNoOfPassengers()>0)
+                return false;
+            if(!(s.getValue().isBlackBoxRetrieved()) && s.getValue().getBlackBoxTicks()<20)
+                return false;
+        }
+        return true;
     }
 
     public String getPrevAction() {
