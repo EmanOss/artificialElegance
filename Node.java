@@ -7,21 +7,28 @@ public class Node {
     //todo - specify no of passengers in case of drop/pickup - we need it for backtracking i think
     private int deaths;
     private int blackBoxesDamaged;
+    private int blackBoxesRetrieved;
+    private int curCapacitiy;
     private Node parent;
-    private HashMap<Pair,Ship> ships;
+    private HashMap<Pair, Ship> ships;
 
-    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged) {
+    private Pair cgCoordinates;
+
+    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates) {
         this.prevAction = prevAction;
         this.parent = parent;
         this.ships = ships;
-        this.deaths=deaths;
-        this.blackBoxesDamaged=blackBoxesDamaged;
+        this.deaths = deaths;
+        this.blackBoxesDamaged = blackBoxesDamaged;
+        this.curCapacitiy = curCapacitiy;
+        this.cgCoordinates = cgCoordinates;
     }
-    public boolean isGoal(){
-        for (Map.Entry<Pair, Ship> s :ships.entrySet()) {
-            if(s.getValue().getNoOfPassengers()>0)
+
+    public boolean isGoal() {
+        for (Map.Entry<Pair, Ship> s : ships.entrySet()) {
+            if (s.getValue().getNoOfPassengers() > 0)
                 return false;
-            if(!(s.getValue().isBlackBoxRetrieved()) && s.getValue().getBlackBoxTicks()<20)
+            if (!(s.getValue().isBlackBoxRetrieved()) && s.getValue().getBlackBoxTicks() < 20)
                 return false;
         }
         return true;
@@ -50,6 +57,7 @@ public class Node {
     public void setShips(HashMap<Pair, Ship> ships) {
         this.ships = ships;
     }
+
     public Node getParent() {
         return parent;
     }
@@ -73,4 +81,21 @@ public class Node {
     public void setBlackBoxesDamaged(int blackBoxesDamaged) {
         this.blackBoxesDamaged = blackBoxesDamaged;
     }
+
+    public int getCurCapacitiy() {
+        return curCapacitiy;
+    }
+
+    public void setCurCapacitiy(int curCapacitiy) {
+        this.curCapacitiy = curCapacitiy;
+    }
+
+    public Pair getCgCoordinates() {
+        return cgCoordinates;
+    }
+
+    public void setCgCoordinates(Pair cgCoordinates) {
+        this.cgCoordinates = cgCoordinates;
+    }
+
 }

@@ -37,13 +37,21 @@ public class Ship {
         this.blackBoxRetrieved = blackBoxRetrieved;
     }
 
-    public void updateShip() {
+    public Pair updateShip() {
+        int dead=0;
+        int boxDamaged=0;
         if (!blackBoxRetrieved) {
-            if (noOfPassengers > 0)
+            if (noOfPassengers > 0) {
+                dead=1;
                 noOfPassengers--;
-            else
+            }
+            else {
                 blackBoxTicks = Math.min(blackBoxTicks + 1, 20);
+                if(blackBoxTicks==20)
+                    boxDamaged=1;
+            }
         }
+        return new Pair(dead, boxDamaged);
     }
 
     public void unUpdateShip() {
