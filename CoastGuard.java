@@ -271,7 +271,7 @@ public class CoastGuard extends GeneralSearch {
         plan.deleteCharAt(plan.length() - 1);
         plan.reverse();
         plan.append(";" + goal.getDeaths());
-        System.out.println(goal.getBlackBoxesDamaged());
+//        System.out.println(goal.getBlackBoxesDamaged());
         plan.append(";" + (goal.getShips().size() - goal.getBlackBoxesDamaged()));
         plan.append(";" + expandedNodes);
         System.out.println(plan);
@@ -325,6 +325,7 @@ public class CoastGuard extends GeneralSearch {
         Node curr;
         while (!pq.isEmpty()) {
             curr = pq.remove();
+            expandedNodes++;
 //            System.out.println(curr.getPrevAction()+", ");
             //check curr is goal
             if (curr.isGoal()) {
@@ -333,9 +334,10 @@ public class CoastGuard extends GeneralSearch {
             }
             //expand curr - add possible children to queue
             HashMap<Pair, Ship> ships = deepClone(curr.getShips());
-            updateGridShips(ships);
+            if(!curr.getPrevAction().equals(""))
+                updateGridShips(ships);
             Pair coord = new Pair(curr.getCgCoordinates().getX(), curr.getCgCoordinates().getY());
-            if (ships.containsKey(coord)) {
+            if (ships.containsKey(coord) && !(ships.get(coord).isBlackBoxRetrieved())) {
                 Ship s = ships.get(coord);
                 int takenPassengers = pickup(s, curr.getCurCapacitiy());
                 if (takenPassengers > 0) {
@@ -343,7 +345,7 @@ public class CoastGuard extends GeneralSearch {
                     int newCapacity = curr.getCurCapacitiy() + takenPassengers;
                     ships.put(coord, new Ship(s.getNoOfPassengers() - takenPassengers));
                     pq.add(new NodeH1("pickup", ships, curr, cost.getX() + curr.getDeaths(), cost.getY() + curr.getBlackBoxesDamaged(), newCapacity, coord));
-                } else if (s.getNoOfPassengers() == 0 && !(s.isBlackBoxRetrieved())) {
+                } else if (s.getNoOfPassengers() == 0 ) {
                     //retrieve
                     s.setBlackBoxRetrieved(true);
                     pq.add(new NodeH1("retrieve", ships, curr, cost.getX() + curr.getDeaths(), cost.getY() + curr.getBlackBoxesDamaged(), curr.getCurCapacitiy(), coord));
