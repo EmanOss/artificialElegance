@@ -1,6 +1,4 @@
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Stack;
+import java.util.*;
 
 public class CoastGuard extends GeneralSearch {
     static int[] dx = {0, -1, 0, 1};
@@ -60,7 +58,8 @@ public class CoastGuard extends GeneralSearch {
         for (int i = 0; i < shipsLocations.length - 2; i += 3) {
             x = Integer.parseInt(shipsLocations[i]);
             y = Integer.parseInt(shipsLocations[i + 1]);
-            s = new Ship(Integer.parseInt(shipsLocations[i + 2]), x, y);
+//            s = new Ship(Integer.parseInt(shipsLocations[i + 2]), x, y);
+            s = new Ship(Integer.parseInt(shipsLocations[i + 2]));
             gridArr[x][y] = s;
             initShips.put(new Pair(x, y), s);
         }
@@ -197,7 +196,8 @@ public class CoastGuard extends GeneralSearch {
                 goal = cur;
                 break;
             }
-            HashMap<Pair, Ship> ships = (HashMap<Pair, Ship>) cur.getShips().clone();
+            HashMap<Pair, Ship> ships = deepClone(cur.getShips());
+//            HashMap<Pair, Ship> ships = (HashMap<Pair, Ship>) cur.getShips().clone();
             updateGridShips(ships);
             Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
             //move
@@ -229,13 +229,20 @@ public class CoastGuard extends GeneralSearch {
                 //retrieve
                 if (ship.getNoOfPassengers() == 0) {
                     ship.setBlackBoxRetrieved(true);
-                    s.push(new Node("retrieve", ships, cur, cost.getX() + cur.getDeaths(), cost.getY() + cur.getBlackBoxesDamaged(), 0, coord));
+                    s.push(new Node("retrieve", ships, cur, cost.getX() + cur.getDeaths(), cost.getY() + cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord));
                 }
             }
 
 
         }
 
+    }
+    static HashMap<Pair, Ship> deepClone(HashMap<Pair,Ship> ships){
+        HashMap<Pair, Ship> copy = new HashMap<>();
+        for (Map.Entry<Pair,Ship> e: ships.entrySet()) {
+            copy.put(e.getKey(),Ship.deepCloneShip(e.getValue()));
+        }
+        return copy;
     }
 
     public static String buildPlan(Node goal) {
@@ -300,67 +307,76 @@ public class CoastGuard extends GeneralSearch {
         return min;
     }
 
-//    public static void greedy(int heuristic) {
-//        Node root = new Node("root", initShips, null, 0, 0, 0, new Pair(cgX, cgY));
-//        if (heuristic == 1)
-//            greedyH1(root);
-//        else
-//            greedyH2();
-//    }
+    public static void greedy(int heuristic) {
+        Node root = new Node("root", initShips, null, 0, 0, 0, new Pair(cgX, cgY));
+        PriorityQueue<Node> pq = new PriorityQueue<>();
+        pq.add(root);
+        if (heuristic == 1)
+            greedyH1(pq);
+        else
+            greedyH2();
+    }
 
 //    public static void greedyH1(Node root) {
-//        //check root is goal
-//        if (root.isGoal()) {
-//            getPath(root);
-//            return;
-//        }
-//        //expand root - add possible children to queue
-//        String prevAction = "";
-//        //todo - update grid/ships
-//        if (grid[cgX][cgY] instanceof Ship s) {
-//            if (currCapacity < maxCapacity && s.getNoOfPassengers() > 0) {
-//                //pickup
-//                pickup(s);
-//                prevAction = "pickup";
-////                Node c1 = new Node(prevAction,ships,root,root.getDeaths()+?, root.getBlackBoxesDamaged()+?);
-//            } else if (s.getNoOfPassengers() == 0 && !(s.isBlackBoxRetrieved())) {
-//                //retrieve
-//                s.setBlackBoxRetrieved(true);
-//                //todo - update blackboxes count somewhere
-//                prevAction = "retrieve";
-//            }
-//        }
-//        if (grid[cgX][cgY] instanceof Station) {
-//            //dropoff
-//            currCapacity = 0;
-//            prevAction = "drop";
-//        } else {
-//            //move
-//            for (int i = 0; i < 4; i++) {
-//                int newX = cgX + dx[i];
-//                int newY = cgY + dy[i];
-//                if (validCell(newX, newY)) {
-//
-//                }
-//            }
-//        }
-        //todo - add children to queue
-        //todo - in order to create new Nodes, i need to calculate cost as parent cost + action cost
-        //todo - action cost calculated feen? - update unUpdateGridShips, updateShip, ... ?
-        //feen el queue asln
-        //pop next and call greedy1 wla da f solve?
-//    }
+    public static void greedyH1(PriorityQueue<Node> pq) {
+        Node curr;
+        while (!pq.isEmpty()) {
+            curr = pq.remove();
+            //check curr is goal
+            if (curr.isGoal()) {
+                goal = curr;
+                return;
+            }
+            //expand curr - add possible children to queue
+//        String prevAction;
+//        int newCapacity = curr.getCurCapacitiy();
+            HashMap<Pair, Ship> ships = (HashMap<Pair, Ship>) curr.getShips().clone();
+            Pair coord = new Pair(curr.getCgCoordinates().getX(), curr.getCgCoordinates().getY());
+            if (curr.getShips().containsKey(coord)) { //?????
+                Ship s = ships.get(coord);
+                int takenPassengers = pickup(s, curr.getCurCapacitiy());
+                if (takenPassengers > 0) {
+                    //pickup
+                    int newCapacity = curr.getCurCapacitiy() + takenPassengers;
+                    s.setNoOfPassengers(s.getNoOfPassengers() - takenPassengers);
+                    pq.add(new Node("pickup", ships, curr,cost.getX() + curr.getDeaths(), cost.getY() + curr.getBlackBoxesDamaged(), newCapacity, coord));
+                } else if (s.getNoOfPassengers() == 0 && !(s.isBlackBoxRetrieved())) {
+                    //retrieve
+                    s.setBlackBoxRetrieved(true);
+                    pq.add(new Node("retrieve", ships, curr, cost.getX() + curr.getDeaths(), cost.getY() + curr.getBlackBoxesDamaged(), curr.getCurCapacitiy(), coord));
+                }
+            }
+            if (grid[cgX][cgY] instanceof Station && curr.getCurCapacitiy() > 0) {
+                //drop-off
+                int newCapacity = 0;
+//                todo prevAction = "drop";
+            } else {
+                //move
+                for (int i = 0; i < 4; i++) {
+                    int newX = cgX + dx[i];
+                    int newY = cgY + dy[i];
+                    if (validCell(newX, newY) &&
+                            (curr.getParent() == null || (curr.getParent() != null && !(newX == curr.getParent().getCgCoordinates().getX() && newY == curr.getParent().getCgCoordinates().getY())))) {
+//                        prevAction = getMove(dx[i], dy[i]);
+//                        s.push(new Node(move, ships, cur, cost.getX() + cur.getDeaths(), cost.getY() + cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), new Pair(newX, newY)));
+                    }
+                }
+            }
+        }
 
-//    public static void pickup(Ship s) {
-//        int diff = maxCapacity - currCapacity;
-//        if (diff < s.getNoOfPassengers()) {
-//            s.setNoOfPassengers(s.getNoOfPassengers() - diff);
-//            currCapacity = maxCapacity;
-//        } else {
-//            s.setNoOfPassengers(0);
-//            currCapacity += diff;
-//        }
-//    }
+//                todo - new Node("pickup", ships, curr, cost.getX() + curr.getDeaths(), cost.getY() + curr.getBlackBoxesDamaged(), newCapacity, coord);
+        //todo - update grid/ships
+//        todo - add children to queue
+//        todo - in order to create new Nodes, i need to calculate cost as parent cost + action cost
+//        todo - action cost calculated feen? - update unUpdateGridShips, updateShip, ... ?
+//        feen el queue asln
+//        pop next and call greedy1 wla da f solve?
+    }
+
+    public static int pickup(Ship ship, int currCap) {
+        //return noOfPassengers picked up, or 0 if pickup action not valid
+        return (ship.getNoOfPassengers() > 0 && currCap < maxCapacity)? Math.min(maxCapacity - currCap, ship.getNoOfPassengers()):0;
+    }
 
     public static void greedyH2() {
         //todo
@@ -370,9 +386,6 @@ public class CoastGuard extends GeneralSearch {
         return n.getShips().size() * minDist();
     }
 
-    public static void getPath(Node last) {
-        //todo
-    }
 
     public static void main(String[] args) {
 //        Pair p1= new Pair(5,5);

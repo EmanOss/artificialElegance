@@ -1,16 +1,14 @@
 public class Ship {
     private int noOfPassengers;
     private int blackBoxTicks;
-
-
     private boolean blackBoxRetrieved;
-    private int x, y;
+//    private int x, y;
 
-    public Ship(int noOfPassengers, int x, int y) {
+    public Ship(int noOfPassengers) {
         this.noOfPassengers = noOfPassengers;
         this.blackBoxTicks = 0;
-        this.x = x;
-        this.y = y;
+//        this.x = x;
+//        this.y = y;
     }
 
     public int getNoOfPassengers() {
@@ -62,6 +60,11 @@ public class Ship {
                 this.noOfPassengers++;
             }
         }
-
+    }
+    public static Ship deepCloneShip(Ship ship){
+        Ship copy = new Ship(ship.getNoOfPassengers());
+        copy.setBlackBoxRetrieved(ship.isBlackBoxRetrieved());
+        copy.setBlackBoxTicks(ship.getBlackBoxTicks());
+        return copy;
     }
 }
