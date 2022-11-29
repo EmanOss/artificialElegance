@@ -46,7 +46,10 @@ public class Ship {
             else {
                 blackBoxTicks = Math.min(blackBoxTicks + 1, 20);
                 if(blackBoxTicks==20)
+                {
                     boxDamaged=1;
+                    blackBoxRetrieved= true;
+                }
             }
         }
         return new Pair(dead, boxDamaged);
