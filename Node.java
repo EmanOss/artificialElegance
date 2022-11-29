@@ -7,7 +7,6 @@ public class Node {
     //todo - specify no of passengers in case of drop/pickup - we need it for backtracking i think
     private int deaths;
     private int blackBoxesDamaged;
-    private int blackBoxesRetrieved;
     private int curCapacitiy;
     private Node parent;
     private HashMap<Pair, Ship> ships;
@@ -25,6 +24,8 @@ public class Node {
     }
 
     public boolean isGoal() {
+        if(curCapacitiy!=0)
+            return false;
         for (Map.Entry<Pair, Ship> s : ships.entrySet()) {
             if (s.getValue().getNoOfPassengers() > 0)
                 return false;
