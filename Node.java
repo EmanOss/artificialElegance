@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class Node {
@@ -13,7 +14,9 @@ public class Node {
 
     private Pair cgCoordinates;
 
-    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates) {
+    private HashSet<Pair> visitedCells;
+
+    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair>visitedCells) {
         this.prevAction = prevAction;
         this.parent = parent;
         this.ships = ships;
@@ -21,18 +24,7 @@ public class Node {
         this.blackBoxesDamaged = blackBoxesDamaged;
         this.curCapacitiy = curCapacitiy;
         this.cgCoordinates = cgCoordinates;
-    }
-
-    public boolean isGoal() {
-        if(curCapacitiy!=0)
-            return false;
-        for (Map.Entry<Pair, Ship> s : ships.entrySet()) {
-            if (s.getValue().getNoOfPassengers() > 0)
-                return false;
-            if (!(s.getValue().isBlackBoxRetrieved()) && s.getValue().getBlackBoxTicks() < 20)
-                return false;
-        }
-        return true;
+        this.visitedCells= visitedCells;
     }
 
     public String getPrevAction() {
@@ -98,5 +90,10 @@ public class Node {
     public void setCgCoordinates(Pair cgCoordinates) {
         this.cgCoordinates = cgCoordinates;
     }
-
+    public HashSet<Pair> getVisitedCells() {
+        return visitedCells;
+    }
+    public void setVisitedCells(HashSet<Pair> visitedCells) {
+        this.visitedCells = visitedCells;
+    }
 }
