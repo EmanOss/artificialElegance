@@ -1,9 +1,10 @@
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class NodeH1 extends Node implements Comparable<NodeH1> {
 
-    public NodeH1(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates) {
-        super(prevAction, ships, parent, deaths, blackBoxesDamaged, curCapacitiy, cgCoordinates);
+    public NodeH1(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair>visitedCells) {
+        super(prevAction, ships, parent, deaths, blackBoxesDamaged, curCapacitiy, cgCoordinates,visitedCells);
     }
     private int minDistShip() {
         //dist bet coast guard and nearest ship
