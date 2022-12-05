@@ -367,7 +367,7 @@ public class CoastGuard extends GeneralSearch {
         return c;
     }
     public static void DFS2(Stack s, int maxDepth) {
-
+//        System.out.println();
         while (!s.empty()) {
             Node cur = (Node) s.pop();
             if(depth(cur)>maxDepth)
@@ -451,10 +451,11 @@ public class CoastGuard extends GeneralSearch {
 
     }
     public static void IDS() {
-        int i=25;
+        int i=0;
         Stack<Node> s = new Stack<>();
         Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY),  new HashSet<>());
         s.push(start);
+        goal=null;
         while(goal==null){
             s=new Stack<>();
             s.push(start);
@@ -633,19 +634,4 @@ public class CoastGuard extends GeneralSearch {
 
 
     }
-
-//    public static boolean isGoal(Node parent) {
-//        for (int i = 0; i < grid.length; i++) {
-//            for (int j = 0; j < grid[0].length; j++) {
-//                if (grid[i][j] instanceof Ship) {
-//                    Ship s = (Ship) grid[i][j];
-//                    if (s.getNoOfPassengers() > 0)
-//                        return false;
-//                    if (!(s.isBlackBoxRetrieved()) && s.getBlackBoxTicks() < 20)
-//                        return false;
-//                }
-//            }
-//        }
-//        return true;
-//    }
 }
