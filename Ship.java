@@ -38,13 +38,12 @@ public class Ship {
     public Pair updateShip() {
         int dead=0;
         int boxDamaged=0;
-
         if (!blackBoxRetrieved) {
             if (noOfPassengers > 0) {
                 dead=1;
                 noOfPassengers--;
             }
-            else {
+            if(noOfPassengers==0) {
                 blackBoxTicks = Math.min(blackBoxTicks + 1, 20);
                 if(blackBoxTicks==20)
                 {
@@ -53,6 +52,20 @@ public class Ship {
                 }
             }
         }
+//        if (!blackBoxRetrieved) {
+//            if (noOfPassengers > 0) {
+//                dead=1;
+//                noOfPassengers--;
+//            }
+//            else {
+//                blackBoxTicks = Math.min(blackBoxTicks + 1, 20);
+//                if(blackBoxTicks==20)
+//                {
+//                    boxDamaged=1;
+//                    blackBoxRetrieved= true;
+//                }
+//            }
+//        }
         return new Pair(dead, boxDamaged);
     }
 
