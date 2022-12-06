@@ -3,8 +3,8 @@ import java.util.HashSet;
 
 public class NodeH1 extends Node implements Comparable<NodeH1> {
 
-    public NodeH1(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair>visitedCells) {
-        super(prevAction, ships, parent, deaths, blackBoxesDamaged, curCapacitiy, cgCoordinates,visitedCells);
+    public NodeH1(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair>visitedCells, int depth) {
+        super(prevAction, ships, parent, deaths, blackBoxesDamaged, curCapacitiy, cgCoordinates,visitedCells, depth);
     }
     private int minDistShip() {
         //dist bet coast guard and nearest ship

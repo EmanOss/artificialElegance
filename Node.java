@@ -16,7 +16,8 @@ public class Node {
 
     private HashSet<Pair> visitedCells;
 
-    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair>visitedCells) {
+    private int depth;
+    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair>visitedCells, int depth) {
         this.prevAction = prevAction;
         this.parent = parent;
         this.ships = ships;
@@ -25,6 +26,7 @@ public class Node {
         this.curCapacitiy = curCapacitiy;
         this.cgCoordinates = cgCoordinates;
         this.visitedCells= visitedCells;
+        this.depth= depth;
     }
 
     public String getPrevAction() {
@@ -95,5 +97,13 @@ public class Node {
     }
     public void setVisitedCells(HashSet<Pair> visitedCells) {
         this.visitedCells = visitedCells;
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void setDepth(int depth) {
+        this.depth = depth;
     }
 }
