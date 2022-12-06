@@ -11,8 +11,9 @@ public class CoastGuard extends GeneralSearch {
     static private Object[][] grid;
     static StringBuilder plan;
     static int expandedNodes;
+//    static int savedPassengers;
     static Node goal;
-
+//    static HashSet<VisitedCell> visited;
     static boolean goalFound = false;
 
 
@@ -105,14 +106,17 @@ public class CoastGuard extends GeneralSearch {
     }
 
     public static String solve(String gridStr, String strategy, Boolean visualize) {
-        expandedNodes=0;
+//        savedPassengers=0;
+//        visited= new HashSet<>();
+        expandedNodes = 0;
         cost.setX(0);
         cost.setY(0);
         grid = convertToGrid(gridStr);
         plan = new StringBuilder("");
+        goal= null;
         switch (strategy) {
             case ("BF"):
-                BFS();
+             BFS();
                 break;
             case ("DF"):
                 DFS();
@@ -197,13 +201,196 @@ public class CoastGuard extends GeneralSearch {
 //        }
 //    }
 
-    public static void BFS(){
+    public static void BFS() {
+        int savedPassengers=0;
+        HashSet<VisitedCell> visited= new HashSet<>();
+        System.out.println(visited.size());
+        expandedNodes = 0;
+        cost.setX(0);
+        cost.setY(0);
+        plan = new StringBuilder("");
+        goal= null;
         Queue<Node> q = new LinkedList<>();
-        Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY),  new HashSet<>(),0);
+        Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), new HashSet<>(), 0);
         q.add(start);
         while (!q.isEmpty()) {
             Node cur = q.poll();
+            expandedNodes++;
+            Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
+            HashMap<Pair, Ship> ships = deepClone(cur.getShips());
+            if (cur.getPrevAction().equals("pickup")) {
+                Ship ship = ships.get(coord);
+                int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
+                savedPassengers += takenPassengers;
+                int newCapacity = cur.getCurCapacitiy() + takenPassengers;
+                ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
+//                if(ship.getNoOfPassengers()==0)
+//                {
+//                    ship.setBlackBoxTicks(-1);
+//                }
+                cur.setCurCapacitiy(newCapacity);
+            }
+            if (cur.getPrevAction().equals("retrieve")) {
+                ships.get(coord).setBlackBoxRetrieved(true);
+            }
+
+            if (cur.getPrevAction().equals("drop"))
+                cur.setCurCapacitiy(0);
+
+            if (!cur.getPrevAction().equals("")) {
+                updateGridShips(ships);
+            }
+            cur.setDeaths(cur.getDeaths() + cost.getX());
+            cur.setBlackBoxesDamaged(cur.getBlackBoxesDamaged() + cost.getY());
+
+            if (isGoal(cur.getCurCapacitiy(), ships)) {
+                goal = cur;
+                break;
+            }
+
+            VisitedCell cell = new VisitedCell(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY(), cur.getCurCapacitiy(), savedPassengers);
+            if (visited.contains(cell)) {
+                continue;
+            }
+            visited.add(cell);
+
+//            HashSet<Pair> hs;
+//            if (!(cur.getPrevAction().equals("pickup") || cur.getPrevAction().equals("drop") || cur.getPrevAction().equals("retrieve"))) {
+//                hs = deepCloneHS(cur.getVisitedCells());
+//                hs.add(coord);
+//            } else {
+//                hs = new HashSet<>();
+//            }
+            HashSet<Pair> hs = new HashSet<>();
+            if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
+                Ship ship = ships.get(coord);
+                //pickup
+                if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
+
+                    q.add(new Node("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+                }
+                //retrieve
+                if (ship.getNoOfPassengers() == 0) {
+                    q.add(new Node("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+                }
+            }
+            if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
+                //drop
+                q.add(new Node("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+            }
+            //move
+            for (int i = 0; i < 4; i++) {
+                //update ships
+                int newX = coord.getX() + dx[i];
+                int newY = coord.getY() + dy[i];
+                Pair newCoord = new Pair(newX, newY);
+                if (validCell(newX, newY)) {
+                    String move = getMove(dx[i], dy[i]);
+                    q.add(new Node(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1));
+                }
+            }
+
+        }
+    }
+
+    public static void DFS() {
+        Stack<Node> s = new Stack<>();
+        Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), new HashSet<>(), 0);
+        s.push(start);
+        while (!s.empty()) {
+            Node cur = s.pop();
+            expandedNodes++;
+            Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
+            HashMap<Pair, Ship> ships = deepClone(cur.getShips());
+            if (cur.getPrevAction().equals("pickup")) {
+                Ship ship = ships.get(coord);
+                int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
+                int newCapacity = cur.getCurCapacitiy() + takenPassengers;
+                ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
+//                if(ship.getNoOfPassengers()==0)
+//                {
+//                    ship.setBlackBoxTicks(-1);
+//                }
+                cur.setCurCapacitiy(newCapacity);
+            }
+            if (cur.getPrevAction().equals("retrieve")) {
+                ships.get(coord).setBlackBoxRetrieved(true);
+            }
+
+            if (cur.getPrevAction().equals("drop"))
+                cur.setCurCapacitiy(0);
+
+            if (!cur.getPrevAction().equals("")) {
+                updateGridShips(ships);
+            }
+            cur.setDeaths(cur.getDeaths() + cost.getX());
+            cur.setBlackBoxesDamaged(cur.getBlackBoxesDamaged() + cost.getY());
+
+            if (isGoal(cur.getCurCapacitiy(), ships)) {
+                goal = cur;
+                System.out.println(depth(goal));
+                break;
+            }
+
+            HashSet<Pair> hs;
+            if (!(cur.getPrevAction().equals("pickup") || cur.getPrevAction().equals("drop") || cur.getPrevAction().equals("retrieve"))) {
+                hs = deepCloneHS(cur.getVisitedCells());
+                hs.add(coord);
+            } else {
+                hs = new HashSet<>();
+            }
+            //move
+            for (int i = 0; i < 4; i++) {
+                //update ships
+                int newX = coord.getX() + dx[i];
+                int newY = coord.getY() + dy[i];
+                Pair newCoord = new Pair(newX, newY);
+                if (validCell(newX, newY) && !hs.contains(newCoord)) {
+                    String move = getMove(dx[i], dy[i]);
+                    s.push(new Node(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1));
+                }
+            }
+            //station
+            if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
+                //drop
+                s.push(new Node("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+            }
+            //ship
+            if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
+                Ship ship = ships.get(coord);
+                //pickup
+                if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
+
+                    s.push(new Node("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+                }
+                //retrieve
+                if (ship.getNoOfPassengers() == 0) {
+                    s.push(new Node("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+                }
+            }
+
+
+        }
+
+    }
+
+    static int depth(Node n) { //todo - check if this method works correctly
+        int c = 0;
+        while (!n.getPrevAction().equals("")) {
+            c++;
+            n = n.getParent();
+        }
+        return c;
+    }
+
+    public static void DFS2(Stack s, int maxDepth) {
+//        System.out.println();
+        while (!s.empty() && goal == null) {
+            Node cur = (Node) s.pop();
+            if (depth(cur) > maxDepth)
+                continue;
 //            System.out.println(cur.getPrevAction());
+//            System.out.println(cur.getCgCoordinates().getX()+", "+ cur.getCgCoordinates().getY());
             expandedNodes++;
             Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
             HashMap<Pair, Ship> ships = deepClone(cur.getShips());
@@ -243,23 +430,6 @@ public class CoastGuard extends GeneralSearch {
             } else {
                 hs = new HashSet<>();
             }
-            if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
-                Ship ship = ships.get(coord);
-                //pickup
-                if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
-
-                    q.add(new Node("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
-                }
-                //retrieve
-                if (ship.getNoOfPassengers() == 0) {
-//                    System.out.println(cur.getPrevAction() + ship.isBlackBoxRetrieved());
-                    q.add(new Node("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
-                }
-            }
-            if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
-                //drop
-                q.add(new Node("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
-            }
             //move
             for (int i = 0; i < 4; i++) {
                 //update ships
@@ -268,76 +438,13 @@ public class CoastGuard extends GeneralSearch {
                 Pair newCoord = new Pair(newX, newY);
                 if (validCell(newX, newY) && !hs.contains(newCoord)) {
                     String move = getMove(dx[i], dy[i]);
-                    q.add(new Node(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth()+1));
-                }
-            }
-
-        }
-    }
-
-    public static void DFS() {
-        Stack<Node> s = new Stack<>();
-        Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY),  new HashSet<>(),0);
-        s.push(start);
-        while (!s.empty()) {
-            Node cur = s.pop();
-            expandedNodes++;
-            Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
-            HashMap<Pair, Ship> ships = deepClone(cur.getShips());
-            if(cur.getPrevAction().equals("pickup"))
-            {
-                Ship ship= ships.get(coord);
-                int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
-                int newCapacity = cur.getCurCapacitiy() + takenPassengers;
-                ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
-//                if(ship.getNoOfPassengers()==0)
-//                {
-//                    ship.setBlackBoxTicks(-1);
-//                }
-                cur.setCurCapacitiy(newCapacity);
-            }
-            if(cur.getPrevAction().equals("retrieve"))
-            {
-                ships.get(coord).setBlackBoxRetrieved(true);
-            }
-
-            if(cur.getPrevAction().equals("drop"))
-                cur.setCurCapacitiy(0);
-
-            if (!cur.getPrevAction().equals("")){
-                updateGridShips(ships);
-            }
-            cur.setDeaths(cur.getDeaths()+cost.getX());
-            cur.setBlackBoxesDamaged(cur.getBlackBoxesDamaged()+ cost.getY());
-
-            if (isGoal(cur.getCurCapacitiy(), ships)) {
-                goal = cur;
-                System.out.println(depth(goal));
-                break;
-            }
-
-            HashSet<Pair> hs;
-            if(!(cur.getPrevAction().equals("pickup")||cur.getPrevAction().equals("drop")||cur.getPrevAction().equals("retrieve"))) {
-                hs= deepCloneHS(cur.getVisitedCells());
-                hs.add(coord);
-            }else{
-                hs= new HashSet<>();
-            }
-            //move
-            for (int i = 0; i < 4; i++) {
-                //update ships
-                int newX = coord.getX() + dx[i];
-                int newY = coord.getY() + dy[i];
-                Pair newCoord= new Pair(newX, newY);
-                if (validCell(newX, newY) && !hs.contains(newCoord)) {
-                    String move = getMove(dx[i], dy[i]);
-                    s.push(new Node(move, ships, cur,  cur.getDeaths(),  cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord,hs, cur.getDepth()+1));
+                    s.push(new Node(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1));
                 }
             }
             //station
             if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
                 //drop
-                s.push(new Node("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord,hs, cur.getDepth()+1));
+                s.push(new Node("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
             }
             //ship
             if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
@@ -345,104 +452,12 @@ public class CoastGuard extends GeneralSearch {
                 //pickup
                 if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
 
-                    s.push(new Node("pickup", ships, cur,  cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord,hs, cur.getDepth()+1));
+                    s.push(new Node("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
                 //retrieve
-                if (ship.getNoOfPassengers() == 0 ) {
-                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
-                    s.push(new Node("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
-                }
-            }
-
-
-        }
-
-    }
-    static int depth(Node n) { //todo - check if this method works correctly
-        int c = 0;
-        while (!n.getPrevAction().equals("")) {
-            c++;
-            n = n.getParent();
-        }
-        return c;
-    }
-    public static void DFS2(Stack s, int maxDepth) {
-//        System.out.println();
-        while (!s.empty() && goal==null) {
-            Node cur = (Node) s.pop();
-            if(depth(cur)>maxDepth)
-                continue;
-//            System.out.println(cur.getPrevAction());
-//            System.out.println(cur.getCgCoordinates().getX()+", "+ cur.getCgCoordinates().getY());
-            expandedNodes++;
-            Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
-            HashMap<Pair, Ship> ships = deepClone(cur.getShips());
-            if(cur.getPrevAction().equals("pickup"))
-            {
-                Ship ship= ships.get(coord);
-                int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
-                int newCapacity = cur.getCurCapacitiy() + takenPassengers;
-                ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
-//                if(ship.getNoOfPassengers()==0)
-//                {
-//                    ship.setBlackBoxTicks(-1);
-//                }
-                cur.setCurCapacitiy(newCapacity);
-            }
-            if(cur.getPrevAction().equals("retrieve"))
-            {
-                ships.get(coord).setBlackBoxRetrieved(true);
-            }
-
-            if(cur.getPrevAction().equals("drop"))
-                cur.setCurCapacitiy(0);
-
-            if (!cur.getPrevAction().equals("")){
-                updateGridShips(ships);
-            }
-            cur.setDeaths(cur.getDeaths()+cost.getX());
-            cur.setBlackBoxesDamaged(cur.getBlackBoxesDamaged()+ cost.getY());
-
-            if (isGoal(cur.getCurCapacitiy(), ships)) {
-                goal = cur;
-                break;
-            }
-
-            HashSet<Pair> hs;
-            if(!(cur.getPrevAction().equals("pickup")||cur.getPrevAction().equals("drop")||cur.getPrevAction().equals("retrieve"))) {
-                hs= deepCloneHS(cur.getVisitedCells());
-                hs.add(coord);
-            }else{
-                hs= new HashSet<>();
-            }
-            //move
-            for (int i = 0; i < 4; i++) {
-                //update ships
-                int newX = coord.getX() + dx[i];
-                int newY = coord.getY() + dy[i];
-                Pair newCoord= new Pair(newX, newY);
-                if (validCell(newX, newY) && !hs.contains(newCoord)) {
-                    String move = getMove(dx[i], dy[i]);
-                    s.push(new Node(move, ships, cur,  cur.getDeaths(),  cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord,hs, cur.getDepth()+1));
-                }
-            }
-            //station
-            if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
-                //drop
-                s.push(new Node("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord,hs, cur.getDepth()+1));
-            }
-            //ship
-            if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
-                Ship ship = ships.get(coord);
-                //pickup
-                if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
-
-                    s.push(new Node("pickup", ships, cur,  cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord,hs, cur.getDepth()+1));
-                }
-                //retrieve
-                if (ship.getNoOfPassengers() == 0 ) {
+                if (ship.getNoOfPassengers() == 0) {
 //                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
-                    s.push(new Node("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+                    s.push(new Node("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
             }
 
@@ -450,21 +465,23 @@ public class CoastGuard extends GeneralSearch {
         }
 
     }
+
     public static void IDS() {
-        int i=10;
+        int i = 10;
         Stack<Node> s = new Stack<>();
-        Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY),  new HashSet<>(),0);
+        Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), new HashSet<>(), 0);
         s.push(start);
-        goal=null;
-        while(goal==null){
-            s=new Stack<>();
-            start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY),  new HashSet<>(),0);
+        goal = null;
+        while (goal == null) {
+            s = new Stack<>();
+            start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), new HashSet<>(), 0);
             s.push(start);
             cost.setX(0);
             cost.setY(0);
             DFS2(s, i++);
         }
     }
+
     static HashMap<Pair, Ship> deepClone(HashMap<Pair, Ship> ships) {
         HashMap<Pair, Ship> copy = new HashMap<>();
         for (Map.Entry<Pair, Ship> e : ships.entrySet()) {
@@ -472,6 +489,7 @@ public class CoastGuard extends GeneralSearch {
         }
         return copy;
     }
+
     static HashSet<Pair> deepCloneHS(HashSet<Pair> cells) {
         HashSet<Pair> copy = new HashSet<>();
         for (Pair p : cells) {
@@ -479,6 +497,7 @@ public class CoastGuard extends GeneralSearch {
         }
         return copy;
     }
+
     public static String buildPlan(Node goal) {
         Node tmp = goal;
         StringBuilder plan = new StringBuilder("");
@@ -501,15 +520,16 @@ public class CoastGuard extends GeneralSearch {
     public static void updateGridShips(HashMap<Pair, Ship> ships) {
         cost.setX(0);
         cost.setY(0);
-        int i=0;
+        int i = 0;
         for (Pair p : ships.keySet()) {
             Pair shipCost = ships.get(p).updateShip();
             cost.setX(shipCost.getX() + cost.getX());
             cost.setY(shipCost.getY() + cost.getY());
         }
     }
+
     public static boolean isGoal(int curCapacity, HashMap<Pair, Ship> ships) {
-        if(curCapacity!=0)
+        if (curCapacity != 0)
             return false;
         for (Map.Entry<Pair, Ship> s : ships.entrySet()) {
             if (s.getValue().getNoOfPassengers() > 0)
@@ -543,7 +563,7 @@ public class CoastGuard extends GeneralSearch {
     }
 
     public static void greedy(int heuristic) {
-        NodeH1 start = new NodeH1("", initShips, null, 0, 0, 0, new Pair(cgX, cgY),  new HashSet<>(),0);
+        NodeH1 start = new NodeH1("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), new HashSet<>(), 0);
         PriorityQueue<NodeH1> pq = new PriorityQueue<>();
         pq.add(start);
         if (heuristic == 1)
@@ -558,27 +578,25 @@ public class CoastGuard extends GeneralSearch {
             expandedNodes++;
             Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
             HashMap<Pair, Ship> ships = deepClone(cur.getShips());
-            if(cur.getPrevAction().equals("pickup"))
-            {
-                Ship ship= ships.get(coord);
+            if (cur.getPrevAction().equals("pickup")) {
+                Ship ship = ships.get(coord);
                 int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
                 int newCapacity = cur.getCurCapacitiy() + takenPassengers;
                 ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
                 cur.setCurCapacitiy(newCapacity);
             }
-            if(cur.getPrevAction().equals("retrieve"))
-            {
+            if (cur.getPrevAction().equals("retrieve")) {
                 ships.get(coord).setBlackBoxRetrieved(true);
             }
 
-            if(cur.getPrevAction().equals("drop"))
+            if (cur.getPrevAction().equals("drop"))
                 cur.setCurCapacitiy(0);
 
-            if (!cur.getPrevAction().equals("")){
+            if (!cur.getPrevAction().equals("")) {
                 updateGridShips(ships);
             }
-            cur.setDeaths(cur.getDeaths()+cost.getX());
-            cur.setBlackBoxesDamaged(cur.getBlackBoxesDamaged()+ cost.getY());
+            cur.setDeaths(cur.getDeaths() + cost.getX());
+            cur.setBlackBoxesDamaged(cur.getBlackBoxesDamaged() + cost.getY());
 
             if (isGoal(cur.getCurCapacitiy(), ships)) {
                 goal = cur;
@@ -587,27 +605,27 @@ public class CoastGuard extends GeneralSearch {
             }
 
             HashSet<Pair> hs;
-            if(!(cur.getPrevAction().equals("pickup")||cur.getPrevAction().equals("drop")||cur.getPrevAction().equals("retrieve"))) {
-                hs= deepCloneHS(cur.getVisitedCells());
+            if (!(cur.getPrevAction().equals("pickup") || cur.getPrevAction().equals("drop") || cur.getPrevAction().equals("retrieve"))) {
+                hs = deepCloneHS(cur.getVisitedCells());
                 hs.add(coord);
-            }else{
-                hs= new HashSet<>();
+            } else {
+                hs = new HashSet<>();
             }
             //move
             for (int i = 0; i < 4; i++) {
                 //update ships
                 int newX = coord.getX() + dx[i];
                 int newY = coord.getY() + dy[i];
-                Pair newCoord= new Pair(newX, newY);
+                Pair newCoord = new Pair(newX, newY);
                 if (validCell(newX, newY) && !hs.contains(newCoord)) {
                     String move = getMove(dx[i], dy[i]);
-                    pq.add(new NodeH1(move, ships, cur,  cur.getDeaths(),  cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord,hs,cur.getDepth()+1));
+                    pq.add(new NodeH1(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1));
                 }
             }
             //station
             if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
                 //drop
-                pq.add(new NodeH1("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord,hs,cur.getDepth()+1));
+                pq.add(new NodeH1("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
             }
             //ship
             if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
@@ -615,12 +633,12 @@ public class CoastGuard extends GeneralSearch {
                 //pickup
                 if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
 
-                    pq.add(new NodeH1("pickup", ships, cur,  cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord,hs, cur.getDepth()+1));
+                    pq.add(new NodeH1("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
                 //retrieve
-                if (ship.getNoOfPassengers() == 0 ) {
+                if (ship.getNoOfPassengers() == 0) {
 //                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
-                    pq.add(new NodeH1("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+                    pq.add(new NodeH1("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
             }
 
