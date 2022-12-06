@@ -4,8 +4,7 @@ import java.util.Map;
 
 public class Node {
 
-    private String prevAction; //follow naming convention in description -> left,right,pickup,up,drop,down,retrieve - or "root" only for root node
-    //todo - specify no of passengers in case of drop/pickup - we need it for backtracking i think
+    private String prevAction;
     private int deaths;
     private int blackBoxesDamaged;
     private int curCapacitiy;

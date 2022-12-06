@@ -10,7 +10,8 @@ public class NodeH1 extends Node implements Comparable<NodeH1> {
         //dist bet coast guard and nearest ship
         int min = Integer.MAX_VALUE;
         for (Pair p : super.getShips().keySet()) {
-            if(super.getShips().get(p).getNoOfPassengers()>0 || super.getShips().get(p).isBlackBoxRetrieved())
+//            if(super.getShips().get(p).getNoOfPassengers()>0 || super.getShips().get(p).isBlackBoxRetrieved())
+            if(!(super.getShips().get(p).isBlackBoxRetrieved()))
                 min = Math.min(min, CoastGuard.distance(super.getCgCoordinates(),p));
         }
         return min;
@@ -19,7 +20,7 @@ public class NodeH1 extends Node implements Comparable<NodeH1> {
         HashMap<Pair, Ship> ships = super.getShips();
         int count=0;
         for (Ship s:ships.values()) {
-            if(s.getNoOfPassengers()>0 || !(s.isBlackBoxRetrieved()))
+            if(!(s.isBlackBoxRetrieved()))
                 count++;
         }
         if(count==0)
