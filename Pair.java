@@ -5,9 +5,6 @@ public class Pair{
         this.x = x;
         this.y = y;
     }
-//    public boolean equals(){
-//
-//    }
 
     public int getX() {
         return x;
