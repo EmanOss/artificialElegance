@@ -118,7 +118,7 @@ public class Node {
         int passengers = 0;
         for (Pair p : ships.keySet()) {
             if (!(ships.get(p).isBlackBoxRetrieved())) {
-                if (minDist < CoastGuard.distance(cgCoordinates, p)) {
+                if (minDist > CoastGuard.distance(cgCoordinates, p)) {
                     minDist = CoastGuard.distance(cgCoordinates, p);
                     passengers = ships.get(p).getNoOfPassengers();
                 }
@@ -128,12 +128,11 @@ public class Node {
     }
 
     public int h2() {
-        int count = 0;
-        for (Pair p : ships.keySet()) {
-            if (!(ships.get(p).isBlackBoxRetrieved()))
-                count++;
-        }
-        return count;
+        int c=0;
+        for (Pair p : ships.keySet())
+            if (ships.get(p).getNoOfPassengers()>0)
+                c++;
+        return c;
     }
 
 

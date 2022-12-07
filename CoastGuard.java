@@ -92,7 +92,7 @@ public class CoastGuard extends GeneralSearch {
                 grid.append((int) (Math.random() * 71 + 30) + ";" + x + "," + y + ";");
             else if (i < stations)
                 grid.append(x + "," + y + ",");
-            else if (i == stations + 1)
+            else if (i == stations)
                 grid.append(x + "," + y + ";");
             else
                 grid.append(x + "," + y + "," + (int) (Math.random() * 101 + 1) + ",");
