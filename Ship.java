@@ -2,13 +2,10 @@ public class Ship {
     private int noOfPassengers;
     private int blackBoxTicks;
     private boolean blackBoxRetrieved;
-//    private int x, y;
 
     public Ship(int noOfPassengers) {
         this.noOfPassengers = noOfPassengers;
         this.blackBoxTicks = 0;
-//        this.x = x;
-//        this.y = y;
     }
 
     public int getNoOfPassengers() {
@@ -69,7 +66,7 @@ public class Ship {
         return new Pair(dead, boxDamaged);
     }
 
-//    public void unUpdateShip() {
+    //    public void unUpdateShip() {
 //        if (!blackBoxRetrieved) {
 //            if (this.blackBoxTicks > 0) {
 //                this.blackBoxTicks = Math.max(this.blackBoxTicks - 1, 0);

@@ -8,6 +8,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
+//import code.CoastGuard;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 
@@ -26,7 +27,7 @@ public class CoastGuardPublic {
 	String grid10= "10,6;59;1,7;0,0,2,2,3,0,5,3;1,3,69,3,4,80,4,7,94,4,9,14,5,2,39;";
 
 
-	@Test(timeout = 50000)
+	@Test(timeout = 10000)
 	public void testa0() throws Exception {
 		String solution = CoastGuard.solve(grid0, "BF", false);
 		solution = solution.replace(" ", "");
@@ -45,7 +46,7 @@ public class CoastGuardPublic {
 		String solution = CoastGuard.solve(grid2, "BF", false);
 		assertTrue("The output actions do not lead to a goal state.", applyPlan(grid2, solution));
 	}
-	@Test(timeout = 50000)
+	@Test(timeout = 10000)
 	public void testa3() throws Exception {
 		String solution = CoastGuard.solve(grid3, "BF", false);
 		assertTrue("The output actions do not lead to a goal state.", applyPlan(grid3, solution));
@@ -127,7 +128,7 @@ public class CoastGuardPublic {
 	@Test(timeout = 10000)
 	public void testb7() throws Exception {
 		String solution = CoastGuard.solve(grid7, "DF", false);
- 		assertTrue("The output actions do not lead to a goal state.", applyPlan(grid7, solution));
+		assertTrue("The output actions do not lead to a goal state.", applyPlan(grid7, solution));
 	}	@Test(timeout = 10000)
 	public void testb8() throws Exception {
 		String solution = CoastGuard.solve(grid8, "DF", false);
