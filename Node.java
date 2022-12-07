@@ -48,7 +48,7 @@ public class Node {
         this.visitedCells = visitedCells;
         this.depth = depth;
         this.savedPassengers = savedPassengers;
-        this.blackBoxesSaved= blackBoxesSaved;
+        this.blackBoxesSaved = blackBoxesSaved;
     }
 
     public String getPrevAction() {
@@ -130,25 +130,29 @@ public class Node {
     public void setDepth(int depth) {
         this.depth = depth;
     }
+
     public int h1() {
         int minDist = Integer.MAX_VALUE;
-        int passengers =0;
+        int passengers = 0;
         for (Pair p : ships.keySet()) {
-            if(!(ships.get(p).isBlackBoxRetrieved())){
-                if(minDist<CoastGuard.distance(cgCoordinates,p)) {
+            if (!(ships.get(p).isBlackBoxRetrieved())) {
+                if (minDist < CoastGuard.distance(cgCoordinates, p)) {
                     minDist = CoastGuard.distance(cgCoordinates, p);
                     passengers = ships.get(p).getNoOfPassengers();
                 }
             }
         }
-        return Math.min(minDist,passengers);
+        return Math.min(minDist, passengers);
     }
-    public int h2(){
-        int count=0;
+
+    public int h2() {
+        int count = 0;
         for (Pair p : ships.keySet()) {
             if (!(ships.get(p).isBlackBoxRetrieved()))
                 count++;
         }
         return count;
     }
+
+
 }
