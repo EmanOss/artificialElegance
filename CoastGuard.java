@@ -419,15 +419,6 @@ public class CoastGuard extends GeneralSearch {
                 break;
             }
             HashSet<Pair> hs= new HashSet<>();
-
-//            HashSet<Pair> hs;
-//            if (!(cur.getPrevAction().equals("pickup") || cur.getPrevAction().equals("drop") || cur.getPrevAction().equals("retrieve"))) {
-//                hs = deepCloneHS(cur.getVisitedCells());
-//                hs.add(coord);
-//            } else {
-//                hs = new HashSet<>();
-//            }
-
             VisitedCell cell = new VisitedCell(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY(), cur.getCurCapacitiy(), cur.getSavedPassengers(), cur.getBlackBoxesSaved());
             if (visited.contains(cell)) {
                 continue;
@@ -469,7 +460,7 @@ public class CoastGuard extends GeneralSearch {
 
     public static void DFS2(Stack s, int maxDepth) {
         HashSet<VisitedCell> visited= new HashSet<>();
-        while (!s.empty() && goal == null) {
+        while (!s.empty()) {
             Node cur = (Node) s.pop();
             expandedNodes++;
             Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
@@ -479,7 +470,6 @@ public class CoastGuard extends GeneralSearch {
                 int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
                 int newCapacity = cur.getCurCapacitiy() + takenPassengers;
                 ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
-
                 cur.setSavedPassengers(cur.getSavedPassengers()+takenPassengers);
                 cur.setCurCapacitiy(newCapacity);
             }
@@ -502,12 +492,7 @@ public class CoastGuard extends GeneralSearch {
                 System.out.println(goal.getDepth());
                 break;
             }
-            if(cur.getDepth()==maxDepth)
-                continue;
-
             HashSet<Pair> hs= new HashSet<>();
-
-
             VisitedCell cell = new VisitedCell(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY(), cur.getCurCapacitiy(), cur.getSavedPassengers(), cur.getBlackBoxesSaved());
             if (visited.contains(cell)) {
                 continue;
@@ -519,9 +504,9 @@ public class CoastGuard extends GeneralSearch {
                 int newX = coord.getX() + dx[i];
                 int newY = coord.getY() + dy[i];
                 Pair newCoord = new Pair(newX, newY);
-                if (validCell(newX, newY) && !hs.contains(newCoord)) {
+                if (validCell(newX, newY)) {
                     String move = getMove(dx[i], dy[i]);
-                    s.push(new Node(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1,0, cur.getBlackBoxesSaved()));
+                    s.push(new Node(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1, cur.getSavedPassengers(), cur.getBlackBoxesSaved()));
                 }
             }
             //station
@@ -539,14 +524,10 @@ public class CoastGuard extends GeneralSearch {
                 }
                 //retrieve
                 if (ship.getNoOfPassengers() == 0) {
-//                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
                     s.push(new Node("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1, cur.getSavedPassengers(), cur.getBlackBoxesSaved()));
                 }
             }
-
-
         }
-
     }
 
     public static void IDS() {
