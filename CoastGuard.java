@@ -685,7 +685,6 @@ public class CoastGuard extends GeneralSearch {
             StringBuilder ticks = new StringBuilder("Black Box Ticks: "+s.getValue().getBlackBoxTicks());
             info.append("\n"+loc+"\n"+passengers+"\n"+ticks+"\n");
         }
-//        info.deleteCharAt(info.length()-1);
         return info.reverse();
     }
 

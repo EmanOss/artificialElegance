@@ -216,7 +216,7 @@ public class CoastGuardPublic {
 	
 	@Test(timeout = 10000)
 	public void testd1() throws Exception {
-		String solution = CoastGuard.solve(grid1, "ID", true);
+		String solution = CoastGuard.solve(grid1, "ID", false);
 		solution = solution.replace(" ", "");
 		assertTrue("The output actions do not lead to a goal state.", applyPlan(grid1, solution));
 	}
