@@ -1,3 +1,4 @@
+import java.io.PrintWriter;
 import java.util.*;
 
 public class CoastGuard extends GeneralSearch {
@@ -136,7 +137,7 @@ public class CoastGuard extends GeneralSearch {
                 aStar(2);
                 break;
         }
-        return buildPlan(goal);
+        return buildPlan(goal,visualize);
     }
     public static void aStar(int heuristic) {
         if (heuristic == 1) {
@@ -531,7 +532,7 @@ public class CoastGuard extends GeneralSearch {
     }
 
     public static void IDS() {
-        int i = 10;
+        int i = 0;
         Stack<Node> s = new Stack<>();
         Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), new HashSet<>(), 0,0,0);
         s.push(start);
@@ -562,23 +563,49 @@ public class CoastGuard extends GeneralSearch {
         return copy;
     }
 
-    public static String buildPlan(Node goal) {
+    public static String buildPlan(Node goal, boolean visualize) {
         Node tmp = goal;
+        int c=goal.getDepth();
         StringBuilder plan = new StringBuilder("");
+        StringBuilder visual = new StringBuilder("");
         while (tmp != null) {
             StringBuilder action = (new StringBuilder(tmp.getPrevAction())).reverse();
             plan.append(action + ",");
+            if(visualize){
+                StringBuilder num = (new StringBuilder("-------Node #"+c--+"-------")).reverse();
+                StringBuilder action2 = (new StringBuilder("Action: "+tmp.getPrevAction())).reverse();
+                StringBuilder deaths = (new StringBuilder("Deaths: "+tmp.getDeaths())).reverse();
+                StringBuilder blackBoxes = (new StringBuilder("Damaged Black Boxes: "+tmp.getDeaths())).reverse();
+                StringBuilder capacity = (new StringBuilder("Coast Guard Capacity: "+tmp.getCurCapacitiy())).reverse();
+                StringBuilder shipInfo = getShipInfo(tmp);
+                StringBuilder coor = (new StringBuilder("Coast Guard Coordinates: " +tmp.getCgCoordinates().toString())).reverse();
+
+                visual.append(shipInfo+"\n"+blackBoxes+"\n"+deaths+"\n"+capacity+"\n"+coor+"\n" +action2 + "\n"+num+"\n");
+            }
+
             tmp = tmp.getParent();
         }
         plan.deleteCharAt(plan.length() - 1);
         plan.deleteCharAt(plan.length() - 1);
         plan.reverse();
         plan.append(";" + goal.getDeaths());
-//        System.out.println(goal.getBlackBoxesDamaged());
         plan.append(";" + (goal.getShips().size() - goal.getBlackBoxesDamaged()));
         plan.append(";" + expandedNodes);
         System.out.println(plan);
+        System.out.println("\n"+"PLAN VISUALIZATION: "+"\n"+visual.reverse());
         return plan.toString();
+    }
+
+    private static StringBuilder getShipInfo(Node tmp) {
+        StringBuilder info = new StringBuilder("        Ships");
+        for (Map.Entry<Pair, Ship> s :tmp.getShips().entrySet()) {
+            StringBuilder loc = new StringBuilder("Ship at Location: "+s.getKey().toString());
+            StringBuilder passengers = new StringBuilder("Passengers: "+s.getValue().getNoOfPassengers());
+            StringBuilder ticks = new StringBuilder("Black Box Ticks: "+s.getValue().getBlackBoxTicks());
+            info.append("\n"+loc+"\n"+passengers+"\n"+ticks+"\n");
+        }
+//        info.deleteCharAt(info.length()-1);
+        return info.reverse();
     }
 
     public static void updateGridShips(HashMap<Pair, Ship> ships) {
@@ -742,7 +769,7 @@ public class CoastGuard extends GeneralSearch {
 
             if (isGoal(cur.getCurCapacitiy(), ships)) {
                 goal = cur;
-                System.out.println(goal.getDepth());
+//                System.out.println(goal.getDepth());
                 break;
             }
 
