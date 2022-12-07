@@ -646,14 +646,15 @@ public class CoastGuard extends GeneralSearch {
 
     public static String buildPlan(Node goal, boolean visualize) {
         Node tmp = goal;
-        int c=goal.getDepth();
+//        int c=goal.getDepth();
         StringBuilder plan = new StringBuilder("");
         StringBuilder visual = new StringBuilder("");
+        StringBuilder stationInfo = getStationInfo(tmp);
         while (tmp != null) {
             StringBuilder action = (new StringBuilder(tmp.getPrevAction())).reverse();
             plan.append(action + ",");
             if(visualize){
-                StringBuilder num = (new StringBuilder("-------Node #"+c--+"-------")).reverse();
+                StringBuilder num = (new StringBuilder("--------------- Node #"+tmp.getDepth()+" ---------------")).reverse();
                 StringBuilder action2 = (new StringBuilder("Action: "+tmp.getPrevAction())).reverse();
                 StringBuilder deaths = (new StringBuilder("Deaths: "+tmp.getDeaths())).reverse();
                 StringBuilder blackBoxes = (new StringBuilder("Damaged Black Boxes: "+tmp.getDeaths())).reverse();
@@ -661,7 +662,7 @@ public class CoastGuard extends GeneralSearch {
                 StringBuilder shipInfo = getShipInfo(tmp);
                 StringBuilder coor = (new StringBuilder("Coast Guard Coordinates: " +tmp.getCgCoordinates().toString())).reverse();
 
-                visual.append(shipInfo+"\n"+blackBoxes+"\n"+deaths+"\n"+capacity+"\n"+coor+"\n" +action2 + "\n"+num+"\n");
+                visual.append(stationInfo+"\n"+shipInfo+"\n"+blackBoxes+"\n"+deaths+"\n"+capacity+"\n"+coor+"\n" +action2 + "\n"+num+"\n");
             }
 
             tmp = tmp.getParent();
@@ -673,8 +674,18 @@ public class CoastGuard extends GeneralSearch {
         plan.append(";" + (goal.getShips().size() - goal.getBlackBoxesDamaged()));
         plan.append(";" + expandedNodes);
         System.out.println(plan);
-        System.out.println("\n"+"PLAN VISUALIZATION: "+"\n"+visual.reverse());
+        if(visualize)
+            System.out.println("\n"+"PLAN VISUALIZATION: "+"\n"+visual.reverse());
         return plan.toString();
+    }
+
+    private static StringBuilder getStationInfo(Node tmp) {
+        StringBuilder info = new StringBuilder("    Stations Locations"+"\n");
+        for (Pair st: stations) {
+            StringBuilder loc = new StringBuilder(st.toString());
+            info.append(loc+"\n");
+        }
+        return info.reverse();
     }
 
     private static StringBuilder getShipInfo(Node tmp) {
