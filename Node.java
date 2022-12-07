@@ -105,27 +105,35 @@ public class Node {
     public void setDepth(int depth) {
         this.depth = depth;
     }
-    private Pair minDistShip() {
-        //dist bet coast guard and nearest ship
-        int min = Integer.MAX_VALUE;
+//    private Pair minDistShip() {
+//        //dist bet coast guard and nearest ship
+//        int min = Integer.MAX_VALUE;
+//        int passengers =0;
+//        for (Pair p : ships.keySet()) {
+//            if(!(ships.get(p).isBlackBoxRetrieved())){
+//                if(min<CoastGuard.distance(cgCoordinates,p)) {
+//                    min = CoastGuard.distance(cgCoordinates, p);
+//                    passengers = ships.get(p).getNoOfPassengers();
+//                }
+//            }
+//        }
+//        return new Pair(min,passengers);
+//    }
+    public int h1() {
+        int minDist = Integer.MAX_VALUE;
         int passengers =0;
         for (Pair p : ships.keySet()) {
             if(!(ships.get(p).isBlackBoxRetrieved())){
-                if(min<CoastGuard.distance(cgCoordinates,p)) {
-                    min = CoastGuard.distance(cgCoordinates, p);
+                if(minDist<CoastGuard.distance(cgCoordinates,p)) {
+                    minDist = CoastGuard.distance(cgCoordinates, p);
                     passengers = ships.get(p).getNoOfPassengers();
                 }
             }
-
         }
-        return new Pair(min,passengers);
-    }
-    public int h1() {
-        return Math.min(minDistShip().getX(),minDistShip().getY());
+        return Math.min(minDist,passengers);
+//        return Math.min(CoastGuard.minDistStation(this.cgCoordinates),Math.min(minDist,passengers));
     }
     public int h2(){
-        //todo - think of a more efficient way
-        //for ex remove ships w damaed BB from ships hashmap, and just get its size for h2
         int count=0;
         for (Pair p : ships.keySet()) {
             if (!(ships.get(p).isBlackBoxRetrieved()))

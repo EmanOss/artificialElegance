@@ -183,7 +183,7 @@ public class CoastGuard extends GeneralSearch {
 
             if (isGoal(cur.getCurCapacitiy(), ships)) {
                 goal = cur;
-//                System.out.println(depth(goal));
+                System.out.println(depth(goal));
                 break;
             }
 
@@ -202,13 +202,13 @@ public class CoastGuard extends GeneralSearch {
                 Pair newCoord = new Pair(newX, newY);
                 if (validCell(newX, newY) && !hs.contains(newCoord)) {
                     String move = getMove(dx[i], dy[i]);
-                    pq.add(new NodeH1Star(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth()+1));
+                    pq.add(new NodeH1Star(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1));
                 }
             }
             //station
             if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
                 //drop
-                pq.add(new NodeH1Star("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+                pq.add(new NodeH1Star("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
             }
             //ship
             if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
@@ -216,15 +216,85 @@ public class CoastGuard extends GeneralSearch {
                 //pickup
                 if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
 
-                    pq.add(new NodeH1Star("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+                    pq.add(new NodeH1Star("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
                 //retrieve
                 if (ship.getNoOfPassengers() == 0) {
-//                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
-                    pq.add(new NodeH1Star("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+                    pq.add(new NodeH1Star("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
             }
+
+
         }
+//        while (!pq.isEmpty()) {
+//            Node cur = pq.poll();
+//            expandedNodes++;
+//            Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
+//            HashMap<Pair, Ship> ships = deepClone(cur.getShips());
+//            if (cur.getPrevAction().equals("pickup")) {
+//                Ship ship = ships.get(coord);
+//                int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
+//                int newCapacity = cur.getCurCapacitiy() + takenPassengers;
+//                ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
+//                cur.setCurCapacitiy(newCapacity);
+//            }
+//            if (cur.getPrevAction().equals("retrieve")) {
+//                ships.get(coord).setBlackBoxRetrieved(true);
+//            }
+//
+//            if (cur.getPrevAction().equals("drop"))
+//                cur.setCurCapacitiy(0);
+//
+//            if (!cur.getPrevAction().equals("")) {
+//                updateGridShips(ships);
+//            }
+//            cur.setDeaths(cur.getDeaths() + cost.getX());
+//            cur.setBlackBoxesDamaged(cur.getBlackBoxesDamaged() + cost.getY());
+//
+//            if (isGoal(cur.getCurCapacitiy(), ships)) {
+//                goal = cur;
+////                System.out.println(depth(goal));
+//                break;
+//            }
+//
+//            HashSet<Pair> hs;
+//            if (!(cur.getPrevAction().equals("pickup") || cur.getPrevAction().equals("drop") || cur.getPrevAction().equals("retrieve"))) {
+//                hs = deepCloneHS(cur.getVisitedCells());
+//                hs.add(coord);
+//            } else {
+//                hs = new HashSet<>();
+//            }
+//            //move
+//            for (int i = 0; i < 4; i++) {
+//                //update ships
+//                int newX = coord.getX() + dx[i];
+//                int newY = coord.getY() + dy[i];
+//                Pair newCoord = new Pair(newX, newY);
+//                if (validCell(newX, newY) && !hs.contains(newCoord)) {
+//                    String move = getMove(dx[i], dy[i]);
+//                    pq.add(new NodeH1Star(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth()+1));
+//                }
+//            }
+//            //station
+//            if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
+//                //drop
+//                pq.add(new NodeH1Star("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+//            }
+//            //ship
+//            if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
+//                Ship ship = ships.get(coord);
+//                //pickup
+//                if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
+//
+//                    pq.add(new NodeH1Star("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+//                }
+//                //retrieve
+//                if (ship.getNoOfPassengers() == 0) {
+////                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
+//                    pq.add(new NodeH1Star("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+//                }
+//            }
+//        }
     }
     private static void aStarH2(PriorityQueue<NodeH2Star> pq) {
         while (!pq.isEmpty()) {
@@ -237,6 +307,10 @@ public class CoastGuard extends GeneralSearch {
                 int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
                 int newCapacity = cur.getCurCapacitiy() + takenPassengers;
                 ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
+//                if(ship.getNoOfPassengers()==0)
+//                {
+//                    ship.setBlackBoxTicks(-1);
+//                }
                 cur.setCurCapacitiy(newCapacity);
             }
             if (cur.getPrevAction().equals("retrieve")) {
@@ -254,7 +328,7 @@ public class CoastGuard extends GeneralSearch {
 
             if (isGoal(cur.getCurCapacitiy(), ships)) {
                 goal = cur;
-//                System.out.println(depth(goal));
+                System.out.println(depth(goal));
                 break;
             }
 
@@ -273,13 +347,13 @@ public class CoastGuard extends GeneralSearch {
                 Pair newCoord = new Pair(newX, newY);
                 if (validCell(newX, newY) && !hs.contains(newCoord)) {
                     String move = getMove(dx[i], dy[i]);
-                    pq.add(new NodeH2Star(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth()+1));
+                    pq.add(new NodeH2Star(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1));
                 }
             }
             //station
             if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
                 //drop
-                pq.add(new NodeH2Star("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+                pq.add(new NodeH2Star("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
             }
             //ship
             if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
@@ -287,14 +361,15 @@ public class CoastGuard extends GeneralSearch {
                 //pickup
                 if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
 
-                    pq.add(new NodeH2Star("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+                    pq.add(new NodeH2Star("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
                 //retrieve
                 if (ship.getNoOfPassengers() == 0) {
-//                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
-                    pq.add(new NodeH2Star("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth()+1));
+                    pq.add(new NodeH2Star("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
             }
+
+
         }
     }
 
@@ -807,13 +882,83 @@ public class CoastGuard extends GeneralSearch {
                 }
                 //retrieve
                 if (ship.getNoOfPassengers() == 0) {
-//                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
                     pq.add(new NodeH2("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
             }
 
 
         }
+//        while (!pq.isEmpty()) {
+//            Node cur = pq.poll();
+//            expandedNodes++;
+//            Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
+//            HashMap<Pair, Ship> ships = deepClone(cur.getShips());
+//            if (cur.getPrevAction().equals("pickup")) {
+//                Ship ship = ships.get(coord);
+//                int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
+//                int newCapacity = cur.getCurCapacitiy() + takenPassengers;
+//                ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
+//                cur.setCurCapacitiy(newCapacity);
+//            }
+//            if (cur.getPrevAction().equals("retrieve")) {
+//                ships.get(coord).setBlackBoxRetrieved(true);
+//            }
+//
+//            if (cur.getPrevAction().equals("drop"))
+//                cur.setCurCapacitiy(0);
+//
+//            if (!cur.getPrevAction().equals("")) {
+//                updateGridShips(ships);
+//            }
+//            cur.setDeaths(cur.getDeaths() + cost.getX());
+//            cur.setBlackBoxesDamaged(cur.getBlackBoxesDamaged() + cost.getY());
+//
+//            if (isGoal(cur.getCurCapacitiy(), ships)) {
+//                goal = cur;
+//                System.out.println(depth(goal));
+//                break;
+//            }
+//
+//            HashSet<Pair> hs;
+//            if (!(cur.getPrevAction().equals("pickup") || cur.getPrevAction().equals("drop") || cur.getPrevAction().equals("retrieve"))) {
+//                hs = deepCloneHS(cur.getVisitedCells());
+//                hs.add(coord);
+//            } else {
+//                hs = new HashSet<>();
+//            }
+//            //move
+//            for (int i = 0; i < 4; i++) {
+//                //update ships
+//                int newX = coord.getX() + dx[i];
+//                int newY = coord.getY() + dy[i];
+//                Pair newCoord = new Pair(newX, newY);
+//                if (validCell(newX, newY) && !hs.contains(newCoord)) {
+//                    String move = getMove(dx[i], dy[i]);
+//                    pq.add(new NodeH2(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1));
+//                }
+//            }
+//            //station
+//            if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
+//                //drop
+//                pq.add(new NodeH2("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+//            }
+//            //ship
+//            if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
+//                Ship ship = ships.get(coord);
+//                //pickup
+//                if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
+//
+//                    pq.add(new NodeH2("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+//                }
+//                //retrieve
+//                if (ship.getNoOfPassengers() == 0) {
+////                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
+//                    pq.add(new NodeH2("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+//                }
+//            }
+//
+//
+//        }
     }
 
     public static void greedyH1(PriorityQueue<NodeH1> pq) {
@@ -881,13 +1026,83 @@ public class CoastGuard extends GeneralSearch {
                 }
                 //retrieve
                 if (ship.getNoOfPassengers() == 0) {
-//                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
                     pq.add(new NodeH1("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
                 }
             }
 
 
         }
+//        while (!pq.isEmpty()) {
+//            Node cur = pq.poll();
+//            expandedNodes++;
+//            Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
+//            HashMap<Pair, Ship> ships = deepClone(cur.getShips());
+//            if (cur.getPrevAction().equals("pickup")) {
+//                Ship ship = ships.get(coord);
+//                int takenPassengers = Math.min(maxCapacity - cur.getCurCapacitiy(), ship.getNoOfPassengers());
+//                int newCapacity = cur.getCurCapacitiy() + takenPassengers;
+//                ship.setNoOfPassengers(ship.getNoOfPassengers() - takenPassengers);
+//                cur.setCurCapacitiy(newCapacity);
+//            }
+//            if (cur.getPrevAction().equals("retrieve")) {
+//                ships.get(coord).setBlackBoxRetrieved(true);
+//            }
+//
+//            if (cur.getPrevAction().equals("drop"))
+//                cur.setCurCapacitiy(0);
+//
+//            if (!cur.getPrevAction().equals("")) {
+//                updateGridShips(ships);
+//            }
+//            cur.setDeaths(cur.getDeaths() + cost.getX());
+//            cur.setBlackBoxesDamaged(cur.getBlackBoxesDamaged() + cost.getY());
+//
+//            if (isGoal(cur.getCurCapacitiy(), ships)) {
+//                goal = cur;
+//                System.out.println(depth(goal));
+//                break;
+//            }
+//
+//            HashSet<Pair> hs;
+//            if (!(cur.getPrevAction().equals("pickup") || cur.getPrevAction().equals("drop") || cur.getPrevAction().equals("retrieve"))) {
+//                hs = deepCloneHS(cur.getVisitedCells());
+//                hs.add(coord);
+//            } else {
+//                hs = new HashSet<>();
+//            }
+//            //move
+//            for (int i = 0; i < 4; i++) {
+//                //update ships
+//                int newX = coord.getX() + dx[i];
+//                int newY = coord.getY() + dy[i];
+//                Pair newCoord = new Pair(newX, newY);
+//                if (validCell(newX, newY) && !hs.contains(newCoord)) {
+//                    String move = getMove(dx[i], dy[i]);
+//                    pq.add(new NodeH1(move, ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), newCoord, hs, cur.getDepth() + 1));
+//                }
+//            }
+//            //station
+//            if (stations.contains(coord) && cur.getCurCapacitiy() > 0) {
+//                //drop
+//                pq.add(new NodeH1("drop", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+//            }
+//            //ship
+//            if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
+//                Ship ship = ships.get(coord);
+//                //pickup
+//                if (ship.getNoOfPassengers() > 0 && cur.getCurCapacitiy() < maxCapacity) {
+//
+//                    pq.add(new NodeH1("pickup", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+//                }
+//                //retrieve
+//                if (ship.getNoOfPassengers() == 0) {
+////                    System.out.println(cur.getPrevAction()+ ship.isBlackBoxRetrieved());
+//                    pq.add(new NodeH1("retrieve", ships, cur, cur.getDeaths(), cur.getBlackBoxesDamaged(), cur.getCurCapacitiy(), coord, hs, cur.getDepth() + 1));
+//                }
+//            }
+//
+//
+//        }
 
 
 //        Node curr;
