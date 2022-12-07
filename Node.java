@@ -15,8 +15,29 @@ public class Node {
 
     private HashSet<Pair> visitedCells;
 
+    public int getBlackBoxesSaved() {
+        return blackBoxesSaved;
+    }
+
+    public void setBlackBoxesSaved(int blackBoxesSaved) {
+        this.blackBoxesSaved = blackBoxesSaved;
+    }
+
+    private int blackBoxesSaved;
+
     private int depth;
-    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair>visitedCells, int depth) {
+
+    public int getSavedPassengers() {
+        return savedPassengers;
+    }
+
+    public void setSavedPassengers(int savedPassengers) {
+        this.savedPassengers = savedPassengers;
+    }
+
+    private int savedPassengers;
+
+    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair> visitedCells, int depth, int savedPassengers, int blackBoxesSaved) {
         this.prevAction = prevAction;
         this.parent = parent;
         this.ships = ships;
@@ -24,8 +45,10 @@ public class Node {
         this.blackBoxesDamaged = blackBoxesDamaged;
         this.curCapacitiy = curCapacitiy;
         this.cgCoordinates = cgCoordinates;
-        this.visitedCells= visitedCells;
-        this.depth= depth;
+        this.visitedCells = visitedCells;
+        this.depth = depth;
+        this.savedPassengers = savedPassengers;
+        this.blackBoxesSaved= blackBoxesSaved;
     }
 
     public String getPrevAction() {
@@ -91,9 +114,11 @@ public class Node {
     public void setCgCoordinates(Pair cgCoordinates) {
         this.cgCoordinates = cgCoordinates;
     }
+
     public HashSet<Pair> getVisitedCells() {
         return visitedCells;
     }
+
     public void setVisitedCells(HashSet<Pair> visitedCells) {
         this.visitedCells = visitedCells;
     }
