@@ -13,7 +13,6 @@ public class Node {
 
     private Pair cgCoordinates;
 
-    private HashSet<Pair> visitedCells;
 
     public int getBlackBoxesSaved() {
         return blackBoxesSaved;
@@ -37,7 +36,7 @@ public class Node {
 
     private int savedPassengers;
 
-    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair> visitedCells, int depth, int savedPassengers, int blackBoxesSaved) {
+    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, int depth, int savedPassengers, int blackBoxesSaved) {
         this.prevAction = prevAction;
         this.parent = parent;
         this.ships = ships;
@@ -45,10 +44,9 @@ public class Node {
         this.blackBoxesDamaged = blackBoxesDamaged;
         this.curCapacitiy = curCapacitiy;
         this.cgCoordinates = cgCoordinates;
-        this.visitedCells = visitedCells;
         this.depth = depth;
         this.savedPassengers = savedPassengers;
-        this.blackBoxesSaved= blackBoxesSaved;
+        this.blackBoxesSaved = blackBoxesSaved;
     }
 
     public String getPrevAction() {
@@ -58,14 +56,6 @@ public class Node {
     public void setPrevAction(String prevAction) {
         this.prevAction = prevAction;
     }
-
-//    public int getCostSoFar() {
-//        return costSoFar;
-//    }
-//
-//    public void setCostSoFar(int costSoFar) {
-//        this.costSoFar = costSoFar;
-//    }
 
     public HashMap<Pair, Ship> getShips() {
         return ships;
@@ -115,14 +105,6 @@ public class Node {
         this.cgCoordinates = cgCoordinates;
     }
 
-    public HashSet<Pair> getVisitedCells() {
-        return visitedCells;
-    }
-
-    public void setVisitedCells(HashSet<Pair> visitedCells) {
-        this.visitedCells = visitedCells;
-    }
-
     public int getDepth() {
         return depth;
     }
@@ -130,25 +112,29 @@ public class Node {
     public void setDepth(int depth) {
         this.depth = depth;
     }
+
     public int h1() {
         int minDist = Integer.MAX_VALUE;
-        int passengers =0;
+        int passengers = 0;
         for (Pair p : ships.keySet()) {
-            if(!(ships.get(p).isBlackBoxRetrieved())){
-                if(minDist<CoastGuard.distance(cgCoordinates,p)) {
+            if (!(ships.get(p).isBlackBoxRetrieved())) {
+                if (minDist < CoastGuard.distance(cgCoordinates, p)) {
                     minDist = CoastGuard.distance(cgCoordinates, p);
                     passengers = ships.get(p).getNoOfPassengers();
                 }
             }
         }
-        return Math.min(minDist,passengers);
+        return Math.min(minDist, passengers);
     }
-    public int h2(){
-        int count=0;
+
+    public int h2() {
+        int count = 0;
         for (Pair p : ships.keySet()) {
             if (!(ships.get(p).isBlackBoxRetrieved()))
                 count++;
         }
         return count;
     }
+
+
 }
