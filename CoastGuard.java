@@ -489,7 +489,7 @@ public class CoastGuard extends GeneralSearch {
 
             if (isGoal(cur.getCurCapacitiy(), ships)) {
                 goal = cur;
-                System.out.println(depth(goal));
+                System.out.println(goal.getDepth());
                 break;
             }
             HashSet<Pair> hs= new HashSet<>();
@@ -542,14 +542,14 @@ public class CoastGuard extends GeneralSearch {
 
     }
 
-    static int depth(Node n) { //todo - check if this method works correctly
-        int c = 0;
-        while (!n.getPrevAction().equals("")) {
-            c++;
-            n = n.getParent();
-        }
-        return c;
-    }
+//    static int depth(Node n) { //todo - check if this method works correctly
+//        int c = 0;
+//        while (!n.getPrevAction().equals("")) {
+//            c++;
+//            n = n.getParent();
+//        }
+//        return c;
+//    }
 
     public static void DFS2(Stack s, int maxDepth) {
         HashSet<VisitedCell> visited= new HashSet<>();
@@ -583,7 +583,7 @@ public class CoastGuard extends GeneralSearch {
 
             if (isGoal(cur.getCurCapacitiy(), ships)) {
                 goal = cur;
-                System.out.println(depth(goal));
+                System.out.println(goal.getDepth());
                 break;
             }
             if(cur.getDepth()==maxDepth)
@@ -846,7 +846,7 @@ public class CoastGuard extends GeneralSearch {
 
             if (isGoal(cur.getCurCapacitiy(), ships)) {
                 goal = cur;
-                System.out.println(depth(goal));
+                System.out.println(goal.getDepth());
                 break;
             }
 
