@@ -13,7 +13,6 @@ public class Node {
 
     private Pair cgCoordinates;
 
-    private HashSet<Pair> visitedCells;
 
     public int getBlackBoxesSaved() {
         return blackBoxesSaved;
@@ -37,7 +36,7 @@ public class Node {
 
     private int savedPassengers;
 
-    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, HashSet<Pair> visitedCells, int depth, int savedPassengers, int blackBoxesSaved) {
+    public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, int depth, int savedPassengers, int blackBoxesSaved) {
         this.prevAction = prevAction;
         this.parent = parent;
         this.ships = ships;
@@ -45,7 +44,6 @@ public class Node {
         this.blackBoxesDamaged = blackBoxesDamaged;
         this.curCapacitiy = curCapacitiy;
         this.cgCoordinates = cgCoordinates;
-        this.visitedCells = visitedCells;
         this.depth = depth;
         this.savedPassengers = savedPassengers;
         this.blackBoxesSaved = blackBoxesSaved;
@@ -58,14 +56,6 @@ public class Node {
     public void setPrevAction(String prevAction) {
         this.prevAction = prevAction;
     }
-
-//    public int getCostSoFar() {
-//        return costSoFar;
-//    }
-//
-//    public void setCostSoFar(int costSoFar) {
-//        this.costSoFar = costSoFar;
-//    }
 
     public HashMap<Pair, Ship> getShips() {
         return ships;
@@ -113,14 +103,6 @@ public class Node {
 
     public void setCgCoordinates(Pair cgCoordinates) {
         this.cgCoordinates = cgCoordinates;
-    }
-
-    public HashSet<Pair> getVisitedCells() {
-        return visitedCells;
-    }
-
-    public void setVisitedCells(HashSet<Pair> visitedCells) {
-        this.visitedCells = visitedCells;
     }
 
     public int getDepth() {
