@@ -123,4 +123,14 @@ public class Node {
     public int h1() {
         return Math.min(minDistShip().getX(),minDistShip().getY());
     }
+    public int h2(){
+        //todo - think of a more efficient way
+        //for ex remove ships w damaed BB from ships hashmap, and just get its size for h2
+        int count=0;
+        for (Pair p : ships.keySet()) {
+            if (!(ships.get(p).isBlackBoxRetrieved()))
+                count++;
+        }
+        return count;
+    }
 }

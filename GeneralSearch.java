@@ -24,6 +24,6 @@ public abstract  class GeneralSearch {
 //    }
 
     public static void aStar(int heuristic) {
-        
+
     }
 }
