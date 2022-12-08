@@ -61,7 +61,7 @@ public class VisitedCell {
         if (this == o) return true;
         if (!(o instanceof VisitedCell)) return false;
         VisitedCell cell = (VisitedCell) o;
-        return x == cell.x && y == cell.y && curCapacity== cell.curCapacity && savedSoFar== cell.savedSoFar && blackBoxesRetrieved==this.blackBoxesRetrieved;
+        return x == cell.x && y == cell.y && curCapacity== cell.curCapacity && savedSoFar== cell.savedSoFar && blackBoxesRetrieved==cell.blackBoxesRetrieved;
     }
     @Override
     public int hashCode() {

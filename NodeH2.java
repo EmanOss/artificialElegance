@@ -1,6 +1,4 @@
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 
 public class NodeH2 implements Comparator<Node> {
     @Override
