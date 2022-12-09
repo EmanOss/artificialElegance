@@ -1,3 +1,5 @@
+package code;
+
 public abstract  class GeneralSearch {
     public static void BFS(){
 
@@ -16,7 +18,7 @@ public abstract  class GeneralSearch {
 //        else
 //            greedyH2();
 //    }
-//    public static void greedyH1(Node root){
+//    public static void greedyH1(code.Node root){
 //
 //    }
 //    public static void greedyH2(){

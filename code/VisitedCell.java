@@ -1,3 +1,5 @@
+package code;
+
 public class VisitedCell {
     private int x;
     private int y;

@@ -1,3 +1,5 @@
+package code;
+
 import java.util.Comparator;
 
 public class NodeH2 implements Comparator<Node> {

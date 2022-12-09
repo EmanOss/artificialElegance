@@ -1,3 +1,5 @@
+package code;
+
 import java.util.*;
 
 public class CoastGuard extends GeneralSearch {
@@ -13,7 +15,7 @@ public class CoastGuard extends GeneralSearch {
     static int expandedNodes;
     //    static int savedPassengers;
     static Node goal;
-//    static HashSet<VisitedCell> visited;
+//    static HashSet<code.VisitedCell> visited;
 
 
     public CoastGuard(int maxCapacity) {
@@ -59,7 +61,7 @@ public class CoastGuard extends GeneralSearch {
         for (int i = 0; i < shipsLocations.length - 2; i += 3) {
             x = Integer.parseInt(shipsLocations[i]);
             y = Integer.parseInt(shipsLocations[i + 1]);
-//            s = new Ship(Integer.parseInt(shipsLocations[i + 2]), x, y);
+//            s = new code.Ship(Integer.parseInt(shipsLocations[i + 2]), x, y);
             s = new Ship(Integer.parseInt(shipsLocations[i + 2]));
             gridArr[x][y] = s;
             initShips.put(new Pair(x, y), s);
@@ -500,7 +502,7 @@ public class CoastGuard extends GeneralSearch {
     private static StringBuilder getShipInfo(Node tmp) {
         StringBuilder info = new StringBuilder("        Ships");
         for (Map.Entry<Pair, Ship> s :tmp.getShips().entrySet()) {
-            StringBuilder loc = new StringBuilder("Ship at Location: "+s.getKey().toString());
+            StringBuilder loc = new StringBuilder("code.Ship at Location: "+s.getKey().toString());
             StringBuilder passengers = new StringBuilder("Passengers: "+s.getValue().getNoOfPassengers());
             StringBuilder ticks = new StringBuilder("Black Box Ticks: "+s.getValue().getBlackBoxTicks());
             info.append("\n"+loc+"\n"+passengers+"\n"+ticks+"\n");
@@ -551,14 +553,14 @@ public class CoastGuard extends GeneralSearch {
 
 
     public static void main(String[] args) {
-//        Pair p1= new Pair(5,5);
-//        Pair p2= new Pair(3,4);
-//        Pair p3= new Pair(1,2);
-//        HashMap<Pair, Ship> hm= new HashMap<>();
-//        hm.put(p1, new Ship(5,5,20));
-//        hm.put(p2, new Ship(5,5,20));
-//        hm.put(p3, new Ship(5,5,20));
-//        System.out.println(hm.containsKey(new Pair(1,1)));
+//        code.Pair p1= new code.Pair(5,5);
+//        code.Pair p2= new code.Pair(3,4);
+//        code.Pair p3= new code.Pair(1,2);
+//        HashMap<code.Pair, code.Ship> hm= new HashMap<>();
+//        hm.put(p1, new code.Ship(5,5,20));
+//        hm.put(p2, new code.Ship(5,5,20));
+//        hm.put(p3, new code.Ship(5,5,20));
+//        System.out.println(hm.containsKey(new code.Pair(1,1)));
 
 
     }

@@ -1,3 +1,5 @@
+package code;
+
 public class Pair{
     private int x,y; //location
 

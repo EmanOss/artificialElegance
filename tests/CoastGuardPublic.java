@@ -1,3 +1,4 @@
+package tests;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-//import code.CoastGuard;
+import code.CoastGuard;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 

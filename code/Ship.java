@@ -1,3 +1,5 @@
+package code;
+
 public class Ship {
     private int noOfPassengers;
     private int blackBoxTicks;

@@ -1,3 +1,5 @@
+package code;
+
 import java.util.Comparator;
 
 public class NodeH1Star  implements Comparator<Node> {
