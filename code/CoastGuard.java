@@ -9,7 +9,7 @@ public class CoastGuard extends GeneralSearch {
     private static int cgX, cgY; //coastGuard location
     private static HashSet<Pair> stations;
     private static HashMap<Pair, Ship> initShips;
-    private static Pair cost = new Pair(0, 0);
+    private static final Pair cost = new Pair(0, 0);
     private static int gridCols, gridRows;
     static StringBuilder plan;
     static int expandedNodes;
@@ -17,7 +17,7 @@ public class CoastGuard extends GeneralSearch {
 
 
     public CoastGuard(int maxCapacity) {
-        maxCapacity = this.maxCapacity;//range 30 to 100 inclusive
+        maxCapacity = CoastGuard.maxCapacity;//range 30 to 100 inclusive
         stations = new HashSet<>();
         initShips = new HashMap<>();
     }
@@ -27,7 +27,7 @@ public class CoastGuard extends GeneralSearch {
     }
 
     public void setMaxCapacity(int maxCapacity) {
-        this.maxCapacity = maxCapacity;
+        CoastGuard.maxCapacity = maxCapacity;
     }
 
     private static void extractGridInfo(String grid) {
@@ -52,7 +52,7 @@ public class CoastGuard extends GeneralSearch {
         }
         //add ships
         String[] shipsLocations = gridSplit[4].split(",");
-        initShips=new HashMap<>();
+        initShips = new HashMap<>();
         Ship s;
         for (int i = 0; i < shipsLocations.length - 2; i += 3) {
             x = Integer.parseInt(shipsLocations[i]);
@@ -64,7 +64,7 @@ public class CoastGuard extends GeneralSearch {
 
     public static String genGrid() {
         StringBuilder grid = new StringBuilder();
-        int n = ((int) Math.random() * 11)+ 5; //5<=n<=15 - i - rows
+        int n = ((int) Math.random() * 11) + 5; //5<=n<=15 - i - rows
         int m = ((int) Math.random() * 11) + 5; //5<=m<=15 - j - columns
         grid.append(m + "," + n + ";");
 
@@ -104,35 +104,19 @@ public class CoastGuard extends GeneralSearch {
         cost.setX(0);
         cost.setY(0);
         extractGridInfo(gridStr);
-        plan = new StringBuilder("");
+        plan = new StringBuilder();
         goal = null;
         switch (strategy) {
-            case ("BF"):
-                BFS();
-                break;
-            case ("DF"):
-                DFS();
-                break;
-            case ("UC"):
-                UC();
-                break;
-            case ("ID"):
-                IDS();
-                break;
-            case ("GR1"):
-                greedy(1);
-                break;
-            case ("GR2"):
-                greedy(2);
-                break;
-            case ("AS1"):
-                aStar(1);
-                break;
-            case ("AS2"):
-                aStar(2);
-                break;
+            case ("BF") -> BFS();
+            case ("DF") -> DFS();
+            case ("UC") -> UC();
+            case ("ID") -> IDS();
+            case ("GR1") -> greedy(1);
+            case ("GR2") -> greedy(2);
+            case ("AS1") -> aStar(1);
+            case ("AS2") -> aStar(2);
         }
-        return buildPlan(goal,visualize);
+        return buildPlan(goal, visualize);
     }
 
     public static void BFS() {
@@ -211,7 +195,6 @@ public class CoastGuard extends GeneralSearch {
     }
 
     public static void DFS() {
-        HashSet<VisitedCell> visited = new HashSet<>();
         Stack<Node> s = new Stack<>();
         Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), 0, 0, 0);
         s.push(start);
@@ -254,8 +237,6 @@ public class CoastGuard extends GeneralSearch {
             }
             if (cur.getDepth() == maxDepth)
                 continue;
-
-
             VisitedCell cell = new VisitedCell(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY(), cur.getCurCapacitiy(), cur.getSavedPassengers(), cur.getBlackBoxesSaved());
             if (visited.contains(cell)) {
                 continue;
@@ -333,7 +314,7 @@ public class CoastGuard extends GeneralSearch {
     }
 
     public static void greedy(int heuristic) {
-        PriorityQueue<Node> pq ;
+        PriorityQueue<Node> pq;
         if (heuristic == 1) {
             Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), 0, 0, 0);
             pq = new PriorityQueue<>(new NodeH1());
@@ -421,7 +402,6 @@ public class CoastGuard extends GeneralSearch {
         }
     }
 
-
     static HashMap<Pair, Ship> deepClone(HashMap<Pair, Ship> ships) {
         HashMap<Pair, Ship> copy = new HashMap<>();
         for (Map.Entry<Pair, Ship> e : ships.entrySet()) {
@@ -432,26 +412,23 @@ public class CoastGuard extends GeneralSearch {
 
     public static String buildPlan(Node goal, boolean visualize) {
         Node tmp = goal;
-        StringBuilder plan = new StringBuilder("");
-        StringBuilder visual = new StringBuilder("");
+        StringBuilder plan = new StringBuilder();
+        StringBuilder visual = new StringBuilder();
         StringBuilder stationInfo = getStationInfo(tmp);
         while (tmp != null) {
             StringBuilder action = (new StringBuilder(tmp.getPrevAction())).reverse();
-//            if((tmp.getPrevAction()).equals(""))
-//                action.append("Root");
             plan.append(action + ",");
-            if(visualize){
-                StringBuilder num = (new StringBuilder("--------------- Action #"+tmp.getDepth()+" ---------------")).reverse();
-                StringBuilder action2 = (new StringBuilder("Action: "+tmp.getPrevAction())).reverse();
-                StringBuilder deaths = (new StringBuilder("Deaths: "+tmp.getDeaths())).reverse();
-                StringBuilder blackBoxes = (new StringBuilder("Damaged Black Boxes: "+tmp.getDeaths())).reverse();
-                StringBuilder capacity = (new StringBuilder("Coast Guard Capacity: "+tmp.getCurCapacitiy())).reverse();
+            if (visualize) {
+                StringBuilder num = (new StringBuilder("--------------- Action #" + tmp.getDepth() + " ---------------")).reverse();
+                StringBuilder action2 = (new StringBuilder("Action: " + tmp.getPrevAction())).reverse();
+                StringBuilder deaths = (new StringBuilder("Deaths: " + tmp.getDeaths())).reverse();
+                StringBuilder blackBoxes = (new StringBuilder("Damaged Black Boxes: " + tmp.getDeaths())).reverse();
+                StringBuilder capacity = (new StringBuilder("Coast Guard Capacity: " + tmp.getCurCapacitiy())).reverse();
                 StringBuilder shipInfo = getShipInfo(tmp);
-                StringBuilder coor = (new StringBuilder("Coast Guard Coordinates: " +tmp.getCgCoordinates().toString())).reverse();
+                StringBuilder coor = (new StringBuilder("Coast Guard Coordinates: " + tmp.getCgCoordinates().toString())).reverse();
 
-                visual.append(stationInfo+"\n"+shipInfo+"\n"+blackBoxes+"\n"+deaths+"\n"+capacity+"\n"+coor+"\n" +action2 + "\n"+num+"\n");
+                visual.append(stationInfo + "\n" + shipInfo + "\n" + blackBoxes + "\n" + deaths + "\n" + capacity + "\n" + coor + "\n" + action2 + "\n" + num + "\n");
             }
-
             tmp = tmp.getParent();
         }
         plan.deleteCharAt(plan.length() - 1);
@@ -461,27 +438,25 @@ public class CoastGuard extends GeneralSearch {
         plan.append(";" + (goal.getShips().size() - goal.getBlackBoxesDamaged()));
         plan.append(";" + expandedNodes);
         System.out.println(plan);
-        if(visualize)
-            System.out.println("\n"+"PLAN VISUALIZATION: "+"\n"+visual.reverse());
+        if (visualize)
+            System.out.println("\n" + "PLAN VISUALIZATION: " + "\n" + visual.reverse());
         return plan.toString();
     }
 
     private static StringBuilder getStationInfo(Node tmp) {
-        StringBuilder info = new StringBuilder("    Stations Locations"+"\n");
-        for (Pair st: stations) {
-            StringBuilder loc = new StringBuilder(st.toString());
-            info.append(loc+"\n");
+        StringBuilder info = new StringBuilder("    Stations Locations" + "\n");
+        for (Pair st : stations) {
+            info.append(st.toString() + "\n");
         }
         return info.reverse();
     }
 
     private static StringBuilder getShipInfo(Node tmp) {
         StringBuilder info = new StringBuilder("        Ships");
-        for (Map.Entry<Pair, Ship> s :tmp.getShips().entrySet()) {
-            StringBuilder loc = new StringBuilder("code.Ship at Location: "+s.getKey().toString());
-            StringBuilder passengers = new StringBuilder("Passengers: "+s.getValue().getNoOfPassengers());
-            StringBuilder ticks = new StringBuilder("Black Box Ticks: "+s.getValue().getBlackBoxTicks());
-            info.append("\n"+loc+"\n"+passengers+"\n"+ticks+"\n");
+        for (Map.Entry<Pair, Ship> s : tmp.getShips().entrySet()) {
+            String loc = "code.Ship at Location: " + s.getKey().toString();
+            String passengers = "Passengers: " + s.getValue().getNoOfPassengers();
+            info.append("\n" + loc + "\n" + passengers + "\n" + "Black Box Ticks: " + s.getValue().getBlackBoxTicks() + "\n");
         }
         return info.reverse();
     }
@@ -523,6 +498,7 @@ public class CoastGuard extends GeneralSearch {
     static boolean validCell(int newX, int newY) {
         return newX >= 0 && newX < gridRows && newY >= 0 && newY < gridCols;
     }
+
     public static int distance(Pair p1, Pair p2) {
         return Math.abs(p1.getX() - p2.getX()) + Math.abs(p1.getY() - p2.getY());
     }

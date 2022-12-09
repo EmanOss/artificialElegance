@@ -35,48 +35,24 @@ public class Ship {
     }
 
     public Pair updateShip() {
-        int dead=0;
-        int boxDamaged=0;
+        int dead = 0;
+        int boxDamaged = 0;
         if (!blackBoxRetrieved) {
             if (noOfPassengers > 0) {
-                dead=1;
+                dead = 1;
                 noOfPassengers--;
             }
-            if(noOfPassengers==0) {
+            if (noOfPassengers == 0) {
                 blackBoxTicks = Math.min(blackBoxTicks + 1, 20);
-                if(blackBoxTicks==20)
-                {
-                    boxDamaged=1;
-                    blackBoxRetrieved= true;
+                if (blackBoxTicks == 20) {
+                    boxDamaged = 1;
+                    blackBoxRetrieved = true;
                 }
             }
         }
-//        if (!blackBoxRetrieved) {
-//            if (noOfPassengers > 0) {
-//                dead=1;
-//                noOfPassengers--;
-//            }
-//            else {
-//                blackBoxTicks = Math.min(blackBoxTicks + 1, 20);
-//                if(blackBoxTicks==20)
-//                {
-//                    boxDamaged=1;
-//                    blackBoxRetrieved= true;
-//                }
-//            }
-//        }
         return new Pair(dead, boxDamaged);
     }
 
-    //    public void unUpdateShip() {
-//        if (!blackBoxRetrieved) {
-//            if (this.blackBoxTicks > 0) {
-//                this.blackBoxTicks = Math.max(this.blackBoxTicks - 1, 0);
-//            } else {
-//                this.noOfPassengers++;
-//            }
-//        }
-//    }
     public static Ship deepCloneShip(Ship ship){
         Ship copy = new Ship(ship.getNoOfPassengers());
         copy.setBlackBoxRetrieved(ship.isBlackBoxRetrieved());

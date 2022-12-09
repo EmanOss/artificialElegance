@@ -44,9 +44,4 @@ public class Pair{
         result = 31 * result + y;
         return result;
     }
-    public Pair deepClonePair(){
-        Pair copy = new Pair(this.x, this.y);
-        return copy;
-    }
-
 }

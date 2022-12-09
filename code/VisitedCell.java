@@ -75,9 +75,5 @@ public class VisitedCell {
         result= 31*result+ blackBoxesRetrieved;
         return result;
     }
-    public VisitedCell deepClonePair(){
-        VisitedCell copy = new VisitedCell(this.x, this.y, this.curCapacity, this.savedSoFar, this.blackBoxesRetrieved);
-        return copy;
-    }
 
 }
