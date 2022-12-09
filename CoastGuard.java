@@ -155,7 +155,7 @@ public class CoastGuard extends GeneralSearch {
         q.add(start);
         while (!q.isEmpty()) {
             Node cur = q.poll();
-            expandedNodes++;
+
             Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
             HashMap<Pair, Ship> ships = deepClone(cur.getShips());
             if (cur.getPrevAction().equals("pickup")) {
@@ -189,6 +189,7 @@ public class CoastGuard extends GeneralSearch {
             if (visited.contains(cell)) {
                 continue;
             }
+            expandedNodes++;
             visited.add(cell);
 
             if (ships.containsKey(coord) && !ships.get(coord).isBlackBoxRetrieved()) {
@@ -235,7 +236,6 @@ public class CoastGuard extends GeneralSearch {
         HashSet<VisitedCell> visited = new HashSet<>();
         while (!s.empty()) {
             Node cur = (Node) s.pop();
-            expandedNodes++;
             Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
             HashMap<Pair, Ship> ships = deepClone(cur.getShips());
             if (cur.getPrevAction().equals("pickup")) {
@@ -273,6 +273,7 @@ public class CoastGuard extends GeneralSearch {
             if (visited.contains(cell)) {
                 continue;
             }
+            expandedNodes++;
             visited.add(cell);
             //move
             for (int i = 0; i < 4; i++) {
@@ -362,7 +363,6 @@ public class CoastGuard extends GeneralSearch {
         HashSet<VisitedCell> visited = new HashSet<>();
         while (!pq.isEmpty()) {
             Node cur = pq.poll();
-            expandedNodes++;
             Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
             HashMap<Pair, Ship> ships = deepClone(cur.getShips());
             if (cur.getPrevAction().equals("pickup")) {
@@ -397,6 +397,7 @@ public class CoastGuard extends GeneralSearch {
             if (visited.contains(cell)) {
                 continue;
             }
+            expandedNodes++;
             visited.add(cell);
 
             //move
@@ -458,9 +459,11 @@ public class CoastGuard extends GeneralSearch {
         StringBuilder stationInfo = getStationInfo(tmp);
         while (tmp != null) {
             StringBuilder action = (new StringBuilder(tmp.getPrevAction())).reverse();
+//            if((tmp.getPrevAction()).equals(""))
+//                action.append("Root");
             plan.append(action + ",");
             if(visualize){
-                StringBuilder num = (new StringBuilder("--------------- Node #"+tmp.getDepth()+" ---------------")).reverse();
+                StringBuilder num = (new StringBuilder("--------------- Action #"+tmp.getDepth()+" ---------------")).reverse();
                 StringBuilder action2 = (new StringBuilder("Action: "+tmp.getPrevAction())).reverse();
                 StringBuilder deaths = (new StringBuilder("Deaths: "+tmp.getDeaths())).reverse();
                 StringBuilder blackBoxes = (new StringBuilder("Damaged Black Boxes: "+tmp.getDeaths())).reverse();
