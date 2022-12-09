@@ -126,7 +126,6 @@ public class CoastGuard extends GeneralSearch {
         q.add(start);
         while (!q.isEmpty()) {
             Node cur = q.poll();
-
             Pair coord = new Pair(cur.getCgCoordinates().getX(), cur.getCgCoordinates().getY());
             HashMap<Pair, Ship> ships = deepClone(cur.getShips());
             if (cur.getPrevAction().equals("pickup")) {
@@ -141,7 +140,6 @@ public class CoastGuard extends GeneralSearch {
                 ships.get(coord).setBlackBoxRetrieved(true);
                 cur.setBlackBoxesSaved(cur.getBlackBoxesSaved() + 1);
             }
-
             if (cur.getPrevAction().equals("drop"))
                 cur.setCurCapacitiy(0);
 
@@ -300,30 +298,25 @@ public class CoastGuard extends GeneralSearch {
 
     public static void aStar(int heuristic) {
         PriorityQueue<Node> pq;
+        Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), 0, 0, 0);
         if (heuristic == 1) {
-            Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), 0, 0, 0);
             pq = new PriorityQueue<>(new NodeH1Star());
-            pq.add(start);
         } else {
-            Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), 0, 0, 0);
             pq = new PriorityQueue<>(new NodeH2Star());
-            pq.add(start);
         }
+        pq.add(start);
         pqTraversal(pq);
-
     }
 
     public static void greedy(int heuristic) {
         PriorityQueue<Node> pq;
+        Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), 0, 0, 0);
         if (heuristic == 1) {
-            Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), 0, 0, 0);
             pq = new PriorityQueue<>(new NodeH1());
-            pq.add(start);
         } else {
-            Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), 0, 0, 0);
             pq = new PriorityQueue<>(new NodeH2());
-            pq.add(start);
         }
+        pq.add(start);
         pqTraversal(pq);
     }
 
@@ -414,7 +407,7 @@ public class CoastGuard extends GeneralSearch {
         Node tmp = goal;
         StringBuilder plan = new StringBuilder();
         StringBuilder visual = new StringBuilder();
-        StringBuilder stationInfo = getStationInfo(tmp);
+        StringBuilder stationInfo = getStationInfo();
         while (tmp != null) {
             StringBuilder action = (new StringBuilder(tmp.getPrevAction())).reverse();
             plan.append(action + ",");
@@ -443,7 +436,7 @@ public class CoastGuard extends GeneralSearch {
         return plan.toString();
     }
 
-    private static StringBuilder getStationInfo(Node tmp) {
+    private static StringBuilder getStationInfo() {
         StringBuilder info = new StringBuilder("    Stations Locations" + "\n");
         for (Pair st : stations) {
             info.append(st.toString() + "\n");
@@ -464,7 +457,6 @@ public class CoastGuard extends GeneralSearch {
     public static void updateGridShips(HashMap<Pair, Ship> ships) {
         cost.setX(0);
         cost.setY(0);
-        int i = 0;
         for (Pair p : ships.keySet()) {
             Pair shipCost = ships.get(p).updateShip();
             cost.setX(shipCost.getX() + cost.getX());
@@ -502,18 +494,7 @@ public class CoastGuard extends GeneralSearch {
     public static int distance(Pair p1, Pair p2) {
         return Math.abs(p1.getX() - p2.getX()) + Math.abs(p1.getY() - p2.getY());
     }
-
-
     public static void main(String[] args) {
-//        code.Pair p1= new code.Pair(5,5);
-//        code.Pair p2= new code.Pair(3,4);
-//        code.Pair p3= new code.Pair(1,2);
-//        HashMap<code.Pair, code.Ship> hm= new HashMap<>();
-//        hm.put(p1, new code.Ship(5,5,20));
-//        hm.put(p2, new code.Ship(5,5,20));
-//        hm.put(p3, new code.Ship(5,5,20));
-//        System.out.println(hm.containsKey(new code.Pair(1,1)));
-
 
     }
 }
