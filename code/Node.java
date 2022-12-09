@@ -117,7 +117,7 @@ public class Node {
         int minDist = Integer.MAX_VALUE;
         int passengers = 0;
         for (Pair p : ships.keySet()) {
-            if (!(ships.get(p).isBlackBoxRetrieved())) {
+            if (ships.get(p).getNoOfPassengers()>0) {
                 if (minDist > CoastGuard.distance(cgCoordinates, p)) {
                     minDist = CoastGuard.distance(cgCoordinates, p);
                     passengers = ships.get(p).getNoOfPassengers();
