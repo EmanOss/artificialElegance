@@ -10,12 +10,10 @@ public class CoastGuard extends GeneralSearch {
     private static HashSet<Pair> stations;
     private static HashMap<Pair, Ship> initShips;
     private static Pair cost = new Pair(0, 0);
-    static private Object[][] grid;
+    private static int gridCols, gridRows;
     static StringBuilder plan;
     static int expandedNodes;
-    //    static int savedPassengers;
     static Node goal;
-//    static HashSet<code.VisitedCell> visited;
 
 
     public CoastGuard(int maxCapacity) {
@@ -32,41 +30,36 @@ public class CoastGuard extends GeneralSearch {
         this.maxCapacity = maxCapacity;
     }
 
-    private static Object[][] convertToGrid(String grid) {
+    private static void extractGridInfo(String grid) {
         String[] gridSplit = grid.split(";");
         //create grid
         String[] dimension = gridSplit[0].split(",");
-        int m = Integer.parseInt(dimension[0]);
-        int n = Integer.parseInt(dimension[1]);
-        Object[][] gridArr = new Object[n][m];
+        gridCols = Integer.parseInt(dimension[0]);
+        gridRows = Integer.parseInt(dimension[1]);
         //add coast guard
         String[] coastGuard = gridSplit[2].split(",");
         cgX = Integer.parseInt(coastGuard[0]);
         cgY = Integer.parseInt(coastGuard[1]);
-        //shouldn't it be yx?
-        gridArr[cgX][cgY] = new CoastGuard(Integer.parseInt(gridSplit[1]));
         maxCapacity = Integer.parseInt(gridSplit[1]);
         //add stations
         int x, y;
         String[] stationsLocations = gridSplit[3].split(",");
+        stations = new HashSet<>();
         for (int i = 0; i < stationsLocations.length - 1; i += 2) {
             x = Integer.parseInt(stationsLocations[i]);
             y = Integer.parseInt(stationsLocations[i + 1]);
-            gridArr[x][y] = new Station();
             stations.add(new Pair(x, y));
         }
         //add ships
         String[] shipsLocations = gridSplit[4].split(",");
+        initShips=new HashMap<>();
         Ship s;
         for (int i = 0; i < shipsLocations.length - 2; i += 3) {
             x = Integer.parseInt(shipsLocations[i]);
             y = Integer.parseInt(shipsLocations[i + 1]);
-//            s = new code.Ship(Integer.parseInt(shipsLocations[i + 2]), x, y);
             s = new Ship(Integer.parseInt(shipsLocations[i + 2]));
-            gridArr[x][y] = s;
             initShips.put(new Pair(x, y), s);
         }
-        return gridArr;
     }
 
     public static String genGrid() {
@@ -107,12 +100,10 @@ public class CoastGuard extends GeneralSearch {
     }
 
     public static String solve(String gridStr, String strategy, Boolean visualize) {
-//        savedPassengers=0;
-//        visited= new HashSet<>();
         expandedNodes = 0;
         cost.setX(0);
         cost.setY(0);
-        grid = convertToGrid(gridStr);
+        extractGridInfo(gridStr);
         plan = new StringBuilder("");
         goal = null;
         switch (strategy) {
@@ -145,13 +136,7 @@ public class CoastGuard extends GeneralSearch {
     }
 
     public static void BFS() {
-        int savedPassengers = 0;
         HashSet<VisitedCell> visited = new HashSet<>();
-        expandedNodes = 0;
-        cost.setX(0);
-        cost.setY(0);
-        plan = new StringBuilder("");
-        goal = null;
         Queue<Node> q = new LinkedList<>();
         Node start = new Node("", initShips, null, 0, 0, 0, new Pair(cgX, cgY), 0, 0, 0);
         q.add(start);
@@ -445,17 +430,8 @@ public class CoastGuard extends GeneralSearch {
         return copy;
     }
 
-    static HashSet<Pair> deepCloneHS(HashSet<Pair> cells) {
-        HashSet<Pair> copy = new HashSet<>();
-        for (Pair p : cells) {
-            copy.add(p.deepClonePair());
-        }
-        return copy;
-    }
-
     public static String buildPlan(Node goal, boolean visualize) {
         Node tmp = goal;
-//        int c=goal.getDepth();
         StringBuilder plan = new StringBuilder("");
         StringBuilder visual = new StringBuilder("");
         StringBuilder stationInfo = getStationInfo(tmp);
@@ -545,7 +521,7 @@ public class CoastGuard extends GeneralSearch {
     }
 
     static boolean validCell(int newX, int newY) {
-        return newX >= 0 && newX < grid.length && newY >= 0 && newY < grid[0].length;
+        return newX >= 0 && newX < gridRows && newY >= 0 && newY < gridCols;
     }
     public static int distance(Pair p1, Pair p2) {
         return Math.abs(p1.getX() - p2.getX()) + Math.abs(p1.getY() - p2.getY());
