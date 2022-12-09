@@ -10,8 +10,10 @@ public class Node {
     private int curCapacitiy;
     private Node parent;
     private HashMap<Pair, Ship> ships;
-
     private Pair cgCoordinates;
+    private int blackBoxesSaved;
+    private int depth;
+    private int savedPassengers;
 
 
     public int getBlackBoxesSaved() {
@@ -22,9 +24,7 @@ public class Node {
         this.blackBoxesSaved = blackBoxesSaved;
     }
 
-    private int blackBoxesSaved;
 
-    private int depth;
 
     public int getSavedPassengers() {
         return savedPassengers;
@@ -33,8 +33,6 @@ public class Node {
     public void setSavedPassengers(int savedPassengers) {
         this.savedPassengers = savedPassengers;
     }
-
-    private int savedPassengers;
 
     public Node(String prevAction, HashMap<Pair, Ship> ships, Node parent, int deaths, int blackBoxesDamaged, int curCapacitiy, Pair cgCoordinates, int depth, int savedPassengers, int blackBoxesSaved) {
         this.prevAction = prevAction;
